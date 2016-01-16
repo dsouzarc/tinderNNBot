@@ -12,13 +12,14 @@ class Tinder:
     facebookID = None;
     tinderToken = None;
     tinderAPIToken = None;
+    myName = None;
 
     session = None;
     headers = None;
 
     def __init__(self, fileName="credentials.json"):
         self.credentialFileName = fileName;
-        self.facebookID, self.facebookToken, self.tinderToken, self.tinderAPIToken, lastUpdated = self.getTokensFromFile();
+        self.facebookID, self.facebookToken, self.tinderToken, self.tinderAPIToken, self.myName, lastUpdated = self.getTokensFromFile();
         self.session = requests.session();
         self.headers = self.generateHeaders();
 
@@ -32,7 +33,7 @@ class Tinder:
 
         #Valid token
         else:
-            print("Found Tinder Token: " + self.tinderToken);
+            print(self.myName + " Found Tinder Token: " + self.tinderToken);
 
     def getTokensFromFile(self):
         with open(self.credentialFileName) as credentials:
@@ -41,21 +42,23 @@ class Tinder:
             facebookToken = data["facebook_token"];
             tinderToken = data["tinder_token"];
             tinderAPIToken = data["tinder_api_token"];
+            myName = data["my_name"];
             lastUpdated = data["last_updated"];
-            return (facebookID, facebookToken, tinderToken, tinderAPIToken, lastUpdated);
+            return (facebookID, facebookToken, tinderToken, tinderAPIToken, myName, lastUpdated);
 
     def saveTokensToFile(self):
         
         data = {
             "facebook_id": self.facebookID,
             "facebook_token": self.facebookToken,
+            "my_name": self.myName,
             "tinder_token": self.tinderToken,
             "tinder_api_token": self.tinderAPIToken,
             "last_updated": int(time.time())
         };
 
         with open(self.credentialFileName, 'w') as credentials:
-            json.dump(data, credentials, indent=4);
+            json.dump(data, credentials, indent=4, sort_keys=True);
             
 
     def login(self):
@@ -90,9 +93,10 @@ class Tinder:
             headers["X-Auth-Token"] = self.tinderToken;
             self.tinderToken = result["token"];
             self.tinderAPIToken = result["user"]["api_token"];
+            self.myName = result["user"]["full_name"];
             self.headers = headers;
             self.session.headers.update(headers);
-            print("Successful login with Tinder Token: " + self.tinderToken + "\tAPI Token: " + self.tinderAPIToken);
+            print("Successful logged " + self.myName + " in with Tinder Token: " + self.tinderToken + "\tAPI Token: " + self.tinderAPIToken);
             self.saveTokensToFile();
         else:
             print("Unsuccessful login");
