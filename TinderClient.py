@@ -7,5 +7,4 @@ recommendations = tinder.getRecommendations();
 
 for person in recommendations:
     print person.name;
-    print person.photos;
 
