@@ -33,7 +33,9 @@ class Tinder:
 
         #Valid token
         else:
+            self.headers["X-Auth-Token"] = self.tinderToken;
             print(self.myName + " Found Tinder Token: " + self.tinderToken);
+            print(json.dump(self.headers, indent=4));
 
     def getTokensFromFile(self):
         with open(self.credentialFileName) as credentials:
@@ -122,6 +124,3 @@ class Tinder:
             "Content-Type": "application/json charset=utf-8"
         };
         return headers;
-
-
-
