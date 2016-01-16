@@ -1,4 +1,5 @@
 import requests;
+import time;
 import json;
 import urllib;
 import urllib2;
@@ -6,6 +7,7 @@ import calendar;
 
 class Tinder:
     
+    credentialFileName = None;
     facebookToken = None;
     facebookID = None;
     tinderToken = None;
@@ -14,26 +16,44 @@ class Tinder:
     headers = None;
 
     def __init__(self, fileName="credentials.json"):
-        with open(fileName) as credentials:
+        self.credentialFileName = fileName;
+        self.facebookID, self.facebookToken, self.tinderToken, lastUpdated = self.getTokensFromFile();
+        self.session = requests.session();
+        self.headers = self.generateHeaders();
+
+        #If we don't have a Tinder token
+        if len(self.tinderToken) == 0:
+            self.login();
+        
+        #If our tindertoken is expired
+        elif lastUpdated > 60 * 60 + int(time.time()):
+            self.login();
+
+        #Valid token
+        else:
+            print("Found Tinder Token: " + self.tinderToken);
+
+    def getTokensFromFile(self):
+        with open(self.credentialFileName) as credentials:
             data = json.load(credentials);
-            self.facebookID = data["facebook_id"];
-            self.facebookToken = data["facebook_token"];
-            self.session = requests.session();
-            self.headers = self.generateHeaders();
+            facebookID = data["facebook_id"];
+            facebookToken = data["facebook_token"];
+            tinderToken = data["tinder_token"];
+            lastUpdated = data["last_updated"];
+            return (facebookID, facebookToken, tinderToken, lastUpdated);
 
-            #If we don't have a Tinder token
-            if len(data["tinder_token"]) == 0:
-                self.login();
+    def saveTokensToFile(self):
+        
+        data = {
+            "facebook_id": self.facebookID,
+            "facebook_token": self.facebookToken,
+            "tinder_token": self.tinderToken,
+            "last_updated": int(time.time())
+        };
+
+        with open(self.credentialFileName, 'w') as credentials:
+            json.dump(data, credentials);
             
-            #If our tindertoken is expired
-            elif data["last_updated"] > 60 * 60 + getSeconds():
-                self.login();
-
-            #Valid token
-            else:
-                self.tinderToken = data["tinder_token"];
-                print("Found Tinder Token: " + self.tinderToken);
-
 
     def login(self):
         payload = { 
@@ -69,6 +89,7 @@ class Tinder:
             self.headers = headers;
             self.session.headers.update(headers);
             print("Successful login with Tinder Token: " + self.tinderToken);
+            self.saveTokensToFile();
         else:
             print("Unsuccessful login");
             print(json.dumps(result, indent=4));
@@ -94,7 +115,5 @@ class Tinder:
         };
         return headers;
 
-    def getSeconds():
-        return calendar.timegm(time.gmtime());
 
 
