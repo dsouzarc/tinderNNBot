@@ -1,9 +1,8 @@
+from Person import Person
+
 import requests;
 import time;
 import json;
-import urllib;
-import urllib2;
-import calendar;
 
 class Tinder:
     
@@ -35,7 +34,6 @@ class Tinder:
         else:
             self.headers["X-Auth-Token"] = self.tinderToken;
             print(self.myName + " Found Tinder Token: " + self.tinderToken);
-            print(json.dump(self.headers, indent=4));
 
     def getTokensFromFile(self):
         with open(self.credentialFileName) as credentials:
@@ -61,7 +59,19 @@ class Tinder:
 
         with open(self.credentialFileName, 'w') as credentials:
             json.dump(data, credentials, indent=4, sort_keys=True);
-            
+
+    def getRecommendations(self):
+        recommendations = [];
+        url = "https://api.gotinder.com/user/recs?locale=en-US";
+        result = self.session.post(url,headers=self.headers, proxies=None);
+
+        if result.status_code == 200:
+            result = result.json();
+            if result["status"] == 200:
+                for person in result["results"]:
+                    recommendation = Person(person);
+                    recommendations.append(recommendation);
+        return recommendations;
 
     def login(self):
         payload = { 
