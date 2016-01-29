@@ -25,6 +25,16 @@ class TinderGui(QtGui.QWidget):
 
         self.show();
 
+    def closeEvent(self, event):
+        
+        reply = QtGui.QMessageBox.question(self, 'Message',
+            "Are you sure to quit?", QtGui.QMessageBox.Yes | 
+            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
+
+        if reply == QtGui.QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()        
 
 def main():
 
