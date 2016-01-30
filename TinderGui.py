@@ -18,8 +18,8 @@ class TinderGui(QtGui.QWidget):
         btn.resize(btn.sizeHint())
         btn.move(50, 50)       
         
-        #x, y, width, height
-        self.setGeometry(300, 300, 250, 150);
+        self.resize(250, 150);
+        self.center();
         self.setWindowTitle('Tinder Bot');
         #self.setWindowIcon(QTGui.QIcon('web.png'));
 
@@ -35,6 +35,13 @@ class TinderGui(QtGui.QWidget):
             event.accept()
         else:
             event.ignore()        
+    def center(self):
+        
+        qr = self.frameGeometry()
+        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+        
 
 def main():
 
