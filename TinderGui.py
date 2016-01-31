@@ -1,6 +1,10 @@
 import sys
 from PyQt4 import QtGui
 
+from Tinder import Tinder;
+from Person import Person;
+
+
 class TinderGui(QtGui.QWidget):
 
     def __init__(self):
@@ -47,9 +51,18 @@ class TinderGui(QtGui.QWidget):
 
 def main():
 
+    tinder = Tinder(fileName="credentials.json");
+
+    recommendations = tinder.getRecommendations();
+
+    for person in recommendations:
+        print person.name;
+
+    print("FINISHED");
     app = QtGui.QApplication(sys.argv);
     tinderGui = TinderGui();
     sys.exit(app.exec_());
+
 
 if __name__ == '__main__':
     main();
