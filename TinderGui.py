@@ -21,12 +21,13 @@ class TinderGui(QtGui.QWidget):
         self.resize(250, 150);
         self.center();
         self.setWindowTitle('Tinder Bot');
-        #self.setWindowIcon(QTGui.QIcon('web.png'));
+        self.setWindowIcon(QtGui.QIcon('tinder_icon.png'));
 
         self.show();
 
+
+    '''
     def closeEvent(self, event):
-        
         reply = QtGui.QMessageBox.question(self, 'Message',
             "Are you sure to quit?", QtGui.QMessageBox.Yes | 
             QtGui.QMessageBox.No, QtGui.QMessageBox.No)
@@ -35,6 +36,7 @@ class TinderGui(QtGui.QWidget):
             event.accept()
         else:
             event.ignore()        
+    '''
     def center(self):
         
         qr = self.frameGeometry()
