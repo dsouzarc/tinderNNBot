@@ -14,6 +14,8 @@ class TinderGui(QtGui.QWidget):
 
     swipeRightButton = None;
     swipeLeftButton = None;
+    superLikeButton = None;
+
     personDescriptionTextEdit = None;
     photoIndex = None;
     currentImageLabel = None;
@@ -43,6 +45,7 @@ class TinderGui(QtGui.QWidget):
         mainSplit = QtGui.QSplitter(QtCore.Qt.Vertical);
         mainSplit.addWidget(self.swipeLeftButton);
         mainSplit.addWidget(self.swipeRightButton);
+        mainSplit.addWidget(self.superLikeButton);
         mainSplit.addWidget(self.personDescriptionTextEdit);
 
         imageSplit = QtGui.QSplitter(QtCore.Qt.Horizontal);
@@ -68,6 +71,8 @@ class TinderGui(QtGui.QWidget):
             self.swipeLeft();
         elif key == QtCore.Qt.Key_Right:
             self.swipeRight();
+        elif key == QtCore.Qt.Key_S:
+            self.superLike();
 
         elif key == QtCore.Qt.Key_Up:
             self.photoIndex -= 1;
@@ -102,12 +107,18 @@ class TinderGui(QtGui.QWidget):
 
         self.swipeRightButton = QtGui.QPushButton('Like', self);
         self.swipeLeftButton = QtGui.QPushButton('Pass', self);
+        self.superLikeButton = QtGui.QPushButton('Super-Like', self);
 
         self.swipeRightButton.clicked.connect(self.swipeRight);
         self.swipeLeftButton.clicked.connect(self.swipeLeft);
+        self.superLikeButton.clicked.connect(self.superLike);
 
         self.personDescriptionTextEdit = QtGui.QTextEdit();
         self.personDescriptionTextEdit.setEnabled(False);
+
+    def superLike(self):
+        self.tinder.superLike(self.recommendations[0].personID);
+        self.handleSwipe();
 
     def swipeRight(self):
         self.tinder.swipeRight(self.recommendations[0].personID);

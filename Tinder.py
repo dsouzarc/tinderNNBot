@@ -91,6 +91,16 @@ class Tinder:
 
 
     '''
+    Super like
+    '''
+    def superLike(self, personId):
+        url = "https://api.gotinder.com/like/" + personId + "/super/";
+        result = self.session.post(url, headers=self.headers,proxies=None);
+
+        print(result.text);
+
+
+    '''
     Swiping left - pass
     '''
     def swipeLeft(self, personId):
