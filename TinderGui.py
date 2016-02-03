@@ -94,10 +94,19 @@ class TinderGui(QtGui.QWidget):
 
 
     def swipeRight(self):
-        print("Swiped right");
+        self.tinder.swipeRight(self.recommendations[0].personID);
+        self.handleSwipe();
 
     def swipeLeft(self):
-        print("Swiped left");
+        self.tinder.swipeLeft(self.recommendations[0].personID);
+        self.handleSwipe();
+
+    def handleSwipe(self):
+        if len(self.recommendations) == 1:
+            self.recommendations = self.tinder.getRecommendations();
+        else:
+            self.recommendations = self.recommendations[1:];
+        self.displayPhoto();
 
 
     '''
