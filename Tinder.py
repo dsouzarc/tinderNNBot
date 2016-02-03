@@ -60,6 +60,16 @@ class Tinder:
         with open(self.credentialFileName, 'w') as credentials:
             json.dump(data, credentials, indent=4, sort_keys=True);
 
+    def swipeRight(self, personId):
+        url = "https://api.gotinder.com/like/" + personId + "?";
+        result = self.session.get(url,headers=self.headers,proxies=None);
+
+        if result.status_code == 200:
+            return result.json();
+        else:
+            print("ERROR LIKING PERSON: " + personId + "\t" + str(result));
+            return result;
+
     def getRecommendations(self):
         recommendations = [];
         url = "https://api.gotinder.com/user/recs?locale=en-US";
