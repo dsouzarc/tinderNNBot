@@ -67,8 +67,18 @@ class Tinder:
         if result.status_code == 200:
             return result.json();
         else:
-            print("ERROR LIKING PERSON: " + personId + "\t" + str(result));
+            print("ERROR LIKING PERSON: " + personId + "\t" + result.text);
             return result;
+
+    def swipeLeft(self, personId):
+        url = "https://api.gotinder.com/pass/" + personId;
+        result = self.session.get(url,headers=self.headers,proxies=None);
+
+        if result.status_code == 200:
+            return True;
+        else:
+            print("ERROR PASSING PERSON: " + personId + "\t" + result.text);
+            return False;
 
     def getRecommendations(self):
         recommendations = [];
