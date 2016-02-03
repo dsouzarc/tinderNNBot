@@ -27,7 +27,7 @@ class Tinder:
             self.login();
         
         #If our tindertoken is expired
-        elif lastUpdated > 60 * 60 + int(time.time()):
+        elif int(time.time()) - lastUpdated > 60 * 60:
             self.login();
 
         #Valid token
