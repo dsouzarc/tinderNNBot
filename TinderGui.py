@@ -10,6 +10,9 @@ class TinderGui(QtGui.QWidget):
 
     tinder = None;
 
+    swipeRightButton = None;
+    swipeLeftButton = None;
+
     def __init__(self):
         super(TinderGui, self).__init__();
 
@@ -18,24 +21,15 @@ class TinderGui(QtGui.QWidget):
 
     def initUI(self):
 
-        QtGui.QToolTip.setFont(QtGui.QFont('SansSerif', 10))
-        
-        self.setToolTip('This is a <b>QWidget</b> widget')
-        
-        btn = QtGui.QPushButton('Button', self)
-        btn.setToolTip('This is a <b>QPushButton</b> widget')
-        btn.resize(btn.sizeHint())
-        btn.move(50, 50)       
-        
-        self.resize(250, 150);
-        self.center();
-
-        self.setWindowTitle('Tinder Bot');
-        self.setWindowIcon(QtGui.QIcon('tinder_icon.png'));
+        self.swipeRightButton = QtGui.QPushButton('Right', self);
+        self.swipeLeftButton = QtGui.QPushButton('Left', self);
+        self.swipeRightButton.clicked.connect(self.swipeRight);
+        self.swipeLeftButton.clicked.connect(self.swipeLeft);
 
         recommendations = self.tinder.getRecommendations();
 
-        url = recommendations[0].photos[0];
+        #url = recommendations[0].photos[0];
+        url = "http://iconshow.me/media/images/ui/ios7-icons/png/512/person_1.png"
         data = urllib.urlopen(url).read();
 
         image = QtGui.QImage()
@@ -44,7 +38,28 @@ class TinderGui(QtGui.QWidget):
         lbl = QtGui.QLabel(self)
         lbl.setPixmap(QtGui.QPixmap(image))
 
+        mainLayout = QtGui.QHBoxLayout()
+        mainLayout.addStretch(1)
+        mainLayout.addWidget(self.swipeLeftButton);
+        mainLayout.addWidget(self.swipeRightButton);
+
+        mainLayout.addWidget(lbl)
+
+        vbox = QtGui.QVBoxLayout()
+        vbox.addStretch(1)
+        #vbox.addLayout(mainLayout)
+        self.setLayout(mainLayout)
+
+        self.setWindowTitle('Tinder Bot');
+        self.setWindowIcon(QtGui.QIcon('tinder_icon.png'));
+        self.resize(250, 150);
+        self.center();
         self.show()
+
+    def swipeRight(self):
+        print("Swiped right");
+    def swipeLeft(self):
+        print("Swiped left");
 
 
     '''
