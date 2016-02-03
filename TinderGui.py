@@ -35,6 +35,7 @@ class TinderGui(QtGui.QWidget):
 
         self.createUIComponents();
         self.displayPhoto();
+        self.displayInformation();
 
         mainLayout = QtGui.QHBoxLayout()
         mainLayout.addStretch(1)
@@ -90,6 +91,12 @@ class TinderGui(QtGui.QWidget):
 
         self.currentImageLabel.setPixmap(QtGui.QPixmap(image))
 
+    def displayInformation(self):
+        person = self.recommendations[0];
+
+        result = person.getName() + "\n" + person.getBirthDate() + "\n" + person.getDistance() + "\n" + person.getBio() + "\n" + person.getCommonConnections() + "\n" + person.getCommonInterests() + "\n" + person.getCommonLikes() + "\n" + person.getCommonFriends() + "\n" + person.getSchools() + "\n" + person.getJobs();
+        self.personDescriptionTextEdit.setText(result);
+
     def createUIComponents(self):
         self.currentImageLabel = QtGui.QLabel(self)
 
@@ -99,14 +106,8 @@ class TinderGui(QtGui.QWidget):
         self.swipeRightButton.clicked.connect(self.swipeRight);
         self.swipeLeftButton.clicked.connect(self.swipeLeft);
 
-        text = "";
-        for i in range(0, 300):
-            text += str(i)
-
         self.personDescriptionTextEdit = QtGui.QTextEdit();
-        self.personDescriptionTextEdit.setText(text);
         self.personDescriptionTextEdit.setEnabled(False);
-
 
     def swipeRight(self):
         self.tinder.swipeRight(self.recommendations[0].personID);
@@ -122,6 +123,7 @@ class TinderGui(QtGui.QWidget):
         else:
             self.recommendations = self.recommendations[1:];
         self.displayPhoto();
+        self.displayInformation();
 
 
     '''
