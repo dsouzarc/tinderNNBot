@@ -1,5 +1,6 @@
 import sys;
 import urllib;
+
 from PyQt4 import QtGui, QtCore
 
 from Tinder import Tinder;
@@ -43,10 +44,9 @@ class TinderGui(QtGui.QWidget):
 
         self.setLayout(mainLayout)
 
-        print("NUM PHOTOS: " + str(len(self.recommendations[0].photos)))
-
         self.setWindowTitle('Tinder Bot');
         self.setWindowIcon(QtGui.QIcon('tinder_icon.png'));
+
         self.resize(500, 500);
         self.center();
         self.show()
@@ -55,8 +55,6 @@ class TinderGui(QtGui.QWidget):
         QtGui.QWidget.keyPressEvent(self, eventQKeyEvent)
 
         key = eventQKeyEvent.key();
-
-        print("HERE: " + str(self.photoIndex))
 
         if key == QtCore.Qt.Key_Left:
             self.swipeLeft();
