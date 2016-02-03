@@ -1,4 +1,6 @@
 import json;
+from dateutil.parser import parse
+from datetime import datetime
 
 class Person:
 
@@ -31,7 +33,7 @@ class Person:
             self.personID = personJSON["personID"];
             self.swiped = personJSON["swiped"];
 
-    def getPersonJSON():
+    def getPersonJSON(self):
         data = {
             "name": self.name,
             "photos" : self.photos,
@@ -41,13 +43,13 @@ class Person:
         };
         return data;
 
-    def getCommonInterests():
+    def getCommonInterests(self):
         interests = [];
         for interest in self.jsonData["common_interests"]:
             interests.append(interest["name"]);
         return interests;
 
-    def getInstagramPictures():
+    def getInstagramPictures(self):
         pictures = [];
         if "instagram" in self.jsonData:
             instagram = self.jsonData["instagram"];
@@ -57,3 +59,73 @@ class Person:
                 for photo in photos:
                     pictures.append(photo["image"]);
         return pictures;
+
+    def getName(self):
+        return self.jsonData['name'];
+
+    def getBio(self):
+        return self.jsonData['bio'];
+
+    def getBirthDate(self):
+        dateString = self.jsonData['birth_date'];
+        date = parse(dateString);
+        result = str(date.month) + "/" + str(date.day) + "/" + str(date.year)
+        return result;
+
+    def isFemale(self):
+        gender = int(self.jsonData['gender']);
+        return gender == 1;
+
+    def getGender(self):
+        if self.isFemale():
+            return "Female";
+        else:
+            return "Male";
+
+    def getDistance(self):
+        return str(self.jsonData['distance_mi']);
+
+    def getCommonConnections(self):
+        result = "";
+        connections = self.jsonData['common_connections'];
+        for connection in connections:
+            result = connection['name'] + " " + result;
+        return result;
+
+    def getCommonInterests(self):
+        result = "";
+        interests = self.jsonData['common_interests'];
+        for interest in interests:
+            result = interest['name'] + " " + result;
+        return result;
+
+    def getCommonLikes(self):
+        result = "";
+        likes = self.jsonData['common_likes'];
+        for like in likes:
+            result = like['name'] + " " + result;
+        return result;
+
+    def getCommonFriends(self):
+        result = "";
+        friends = self.jsonData['common_friends'];
+        for friend in friends:
+            result = friend['name'] + " " + result;
+        return result;
+
+    def getSchools(self):
+        result = "";
+        schools = self.jsonData['schools'];
+        for school in schools:
+            result = school['name'] + " " + result;
+        return result;
+
+    def getJobs(self):
+        result = "";
+        jobs = self.jsonData['jobs'];
+        for job in jobs:
+            if 'title' in job:
+                result += (job['title']['name'] + ", ");
+            if 'company' in job:
+                result = job['company']['name'] + " " + result;
+        return result;
