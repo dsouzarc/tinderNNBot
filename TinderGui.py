@@ -12,10 +12,11 @@ class TinderGui(QtGui.QWidget):
     tinder = None;
     recommendations = None;
 
-    currentImageLabel = None;
     swipeRightButton = None;
     swipeLeftButton = None;
+    personDescriptionTextEdit = None;
     photoIndex = None;
+    currentImageLabel = None;
 
     def __init__(self):
         super(TinderGui, self).__init__();
@@ -37,17 +38,23 @@ class TinderGui(QtGui.QWidget):
 
         mainLayout = QtGui.QHBoxLayout()
         mainLayout.addStretch(1)
+        
+        mainSplit = QtGui.QSplitter(QtCore.Qt.Vertical);
+        mainSplit.addWidget(self.swipeLeftButton);
+        mainSplit.addWidget(self.swipeRightButton);
+        mainSplit.addWidget(self.personDescriptionTextEdit);
 
-        mainLayout.addWidget(self.swipeLeftButton);
-        mainLayout.addWidget(self.swipeRightButton);
-        mainLayout.addWidget(self.currentImageLabel)
+        imageSplit = QtGui.QSplitter(QtCore.Qt.Horizontal);
+        imageSplit.addWidget(mainSplit);
+        imageSplit.addWidget(self.currentImageLabel);
 
+        mainLayout.addWidget(imageSplit);
         self.setLayout(mainLayout)
 
         self.setWindowTitle('Tinder Bot');
         self.setWindowIcon(QtGui.QIcon('tinder_icon.png'));
 
-        self.resize(500, 500);
+        self.resize(800, 800);
         self.center();
         self.show()
         
@@ -86,11 +93,19 @@ class TinderGui(QtGui.QWidget):
     def createUIComponents(self):
         self.currentImageLabel = QtGui.QLabel(self)
 
-        self.swipeRightButton = QtGui.QPushButton('Right', self);
-        self.swipeLeftButton = QtGui.QPushButton('Left', self);
+        self.swipeRightButton = QtGui.QPushButton('Like', self);
+        self.swipeLeftButton = QtGui.QPushButton('Pass', self);
 
         self.swipeRightButton.clicked.connect(self.swipeRight);
         self.swipeLeftButton.clicked.connect(self.swipeLeft);
+
+        text = "";
+        for i in range(0, 300):
+            text += str(i)
+
+        self.personDescriptionTextEdit = QtGui.QTextEdit();
+        self.personDescriptionTextEdit.setText(text);
+        self.personDescriptionTextEdit.setEnabled(False);
 
 
     def swipeRight(self):
