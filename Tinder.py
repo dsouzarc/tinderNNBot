@@ -5,7 +5,11 @@ import time;
 import json;
 
 class Tinder:
-    
+
+    '''
+    Handles all Tinder API calls 
+    '''
+
     credentialFileName = None;
     facebookToken = None;
     facebookID = None;
@@ -16,6 +20,10 @@ class Tinder:
     session = None;
     headers = None;
 
+
+    '''
+    Constructor 
+    '''
     def __init__(self, fileName="credentials.json"):
         self.credentialFileName = fileName;
         self.facebookID, self.facebookToken, self.tinderToken, self.tinderAPIToken, self.myName, lastUpdated = self.getTokensFromFile();
@@ -35,6 +43,10 @@ class Tinder:
             self.headers["X-Auth-Token"] = self.tinderToken;
             print(self.myName + " Found Tinder Token: " + self.tinderToken);
 
+
+    '''
+    Reads user credentials from file
+    '''
     def getTokensFromFile(self):
         with open(self.credentialFileName) as credentials:
             data = json.load(credentials);
@@ -46,8 +58,11 @@ class Tinder:
             lastUpdated = data["last_updated"];
             return (facebookID, facebookToken, tinderToken, tinderAPIToken, myName, lastUpdated);
 
+
+    '''
+    Saves the tokens to file
+    '''
     def saveTokensToFile(self):
-        
         data = {
             "facebook_id": self.facebookID,
             "facebook_token": self.facebookToken,
@@ -60,6 +75,10 @@ class Tinder:
         with open(self.credentialFileName, 'w') as credentials:
             json.dump(data, credentials, indent=4, sort_keys=True);
 
+
+    '''
+    Swiping right - like
+    '''
     def swipeRight(self, personId):
         url = "https://api.gotinder.com/like/" + personId + "?";
         result = self.session.get(url,headers=self.headers,proxies=None);
@@ -70,6 +89,10 @@ class Tinder:
             print("ERROR LIKING PERSON: " + personId + "\t" + result.text);
             return result;
 
+
+    '''
+    Swiping left - pass
+    '''
     def swipeLeft(self, personId):
         url = "https://api.gotinder.com/pass/" + personId;
         result = self.session.get(url,headers=self.headers,proxies=None);
@@ -80,6 +103,10 @@ class Tinder:
             print("ERROR PASSING PERSON: " + personId + "\t" + result.text);
             return False;
 
+
+    '''
+    Gets a list of people to swipe
+    '''
     def getRecommendations(self):
         recommendations = [];
         url = "https://api.gotinder.com/user/recs?locale=en-US";
@@ -91,8 +118,16 @@ class Tinder:
                 for person in result["results"]:
                     recommendation = Person(person);
                     recommendations.append(recommendation);
+
+        if len(recommendations) == 0:
+            print("TRYING AGAIN 0 RECOMMENDATIONS: " + result.text);
+            return self.getRecommendations();
         return recommendations;
 
+
+    '''
+    Log in to Tinder API
+    '''
     def login(self):
         payload = { 
             "force_refresh": "false",
@@ -136,6 +171,9 @@ class Tinder:
             raise errors.RequestError("Couldn't authenticate");
         
 
+    '''
+    The headers used
+    '''
     def generateHeaders(self):
         headers = {
             "Host": "api.gotinder.com",
