@@ -2,6 +2,7 @@ import sys;
 import urllib;
 import json;
 import cv2;
+import numpy
 from PIL import Image
 
 from PyQt4 import QtGui, QtCore
@@ -114,21 +115,17 @@ class TinderGui(QtGui.QWidget):
         imageName = 'picture.png'
         cascPath = 'haarcascade_frontalface_default.xml'
 
-        f = open(imageName, 'wb');
-        f.write(imageData);
-        f.close();
-
         faceCascade = cv2.CascadeClassifier(cascPath)
-        image = cv2.imread(imageName, cv2.IMREAD_UNCHANGED);
+        image = numpy.asarray(bytearray(imageData), dtype="uint8")
+        image = cv2.imdecode(image, cv2.IMREAD_COLOR)
 
         #Scale factor = 1.1 b/c faces closer to camera are bigger than ones in back
-        faces = faceCascade.detectMultiScale(image, scaleFactor=1.2, minNeighbors=1, minSize=(30,30), flags = cv2.cv.CV_HAAR_SCALE_IMAGE)
-
-        print("FOUND {0} IMAGES".format(len(faces)))
+        faces = faceCascade.detectMultiScale(image, scaleFactor=1.4, minNeighbors=1, minSize=(80,80), flags = cv2.cv.CV_HAAR_SCALE_IMAGE)
 
         for (x, y, w, h) in faces:
             cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
         cv2.imwrite(imageName, image);
+
 
         return QtGui.QPixmap(imageName);
 
