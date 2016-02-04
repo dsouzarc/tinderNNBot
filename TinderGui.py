@@ -32,6 +32,10 @@ class TinderGui(QtGui.QWidget):
 
     swipeInformationTextEdit = None;
 
+    eyeColorLabel = None;
+    eyeColorComboBox = None;
+
+
 
     def __init__(self):
         super(TinderGui, self).__init__();
@@ -67,8 +71,13 @@ class TinderGui(QtGui.QWidget):
         middleSection.addWidget(self.currentImageLabel);
         middleSection.addWidget(buttonSection);
 
+        eyeColorSection = QtGui.QSplitter(Qt.Horizontal);
+        eyeColorSection.addWidget(self.eyeColorLabel);
+        eyeColorSection.addWidget(self.eyeColorComboBox);
+
         rightSection = QtGui.QSplitter(QtCore.Qt.Vertical);
         rightSection.addWidget(self.swipeInformationTextEdit);
+        rightSection.addWidget(eyeColorSection);
 
         mainLayout = QtGui.QSplitter(QtCore.Qt.Horizontal)
         mainLayout.addWidget(self.personDescriptionTextEdit);
@@ -163,6 +172,17 @@ class TinderGui(QtGui.QWidget):
 
         self.swipeInformationTextEdit = QtGui.QTextEdit();
         self.swipeInformationTextEdit.setEnabled(False);
+
+        self.eyeColorLabel = QtGui.QLabel(self);
+        self.eyeColorComboBox = QtGui.QComboBox(self);
+        self.addEyeColorOptions();
+
+    def addEyeColorOptions(self):
+        self.eyeColorComboBox.addItem("Brown");
+        self.eyeColorComboBox.addItem("Blue");
+        self.eyeColorComboBox.addItem("Green");
+
+
 
     def superLike(self):
         success, result = self.tinder.superLike(self.recommendations[0].personID);
