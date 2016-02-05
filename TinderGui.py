@@ -182,11 +182,13 @@ class TinderGui(QtGui.QWidget):
         self.eyeColorLabel = QtGui.QLabel(self);
         self.eyeColorLabel.setText("Eye Color: ");
         self.eyeColorComboBox = QtGui.QComboBox(self);
+        self.eyeColorComboBox.activated[str].connect(self.changedEyeColor);
         self.addEyeColorOptions();
 
         self.hairColorLabel = QtGui.QLabel(self);
         self.hairColorLabel.setText("Hair Color: ");
         self.hairColorComboBox = QtGui.QComboBox(self);
+        self.hairColorComboBox.activated[str].connect(self.changedHairColor);
         self.addHairColorOptions();
 
     def addEyeColorOptions(self):
@@ -199,6 +201,12 @@ class TinderGui(QtGui.QWidget):
         self.hairColorComboBox.addItem("Brown");
         self.hairColorComboBox.addItem("Blonde");
         self.hairColorComboBox.addItem("Red");
+
+    def changedEyeColor(self, text):
+        print("Changed to: " + text);
+
+    def changedHairColor(self):
+        print("Changed to: " + text);
 
 
     def superLike(self):
