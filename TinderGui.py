@@ -35,6 +35,8 @@ class TinderGui(QtGui.QWidget):
     eyeColorLabel = None;
     eyeColorComboBox = None;
 
+    hairColorLabel = None;
+    hairColorComboBox = None;
 
 
     def __init__(self):
@@ -74,6 +76,10 @@ class TinderGui(QtGui.QWidget):
         eyeColorSection = QtGui.QSplitter(Qt.Horizontal);
         eyeColorSection.addWidget(self.eyeColorLabel);
         eyeColorSection.addWidget(self.eyeColorComboBox);
+
+        hairColorSection = QtGui.QSplitter(Qt.Horizontal);
+        hairColorSection.addWidget(self.hairColorLabel);
+        hairColorSection.addWidget(self.hairColorComboBox);
 
         rightSection = QtGui.QSplitter(QtCore.Qt.Vertical);
         rightSection.addWidget(self.swipeInformationTextEdit);
@@ -174,14 +180,25 @@ class TinderGui(QtGui.QWidget):
         self.swipeInformationTextEdit.setEnabled(False);
 
         self.eyeColorLabel = QtGui.QLabel(self);
+        self.eyeColorLabel.setText("Eye Color: ");
         self.eyeColorComboBox = QtGui.QComboBox(self);
         self.addEyeColorOptions();
+
+        self.hairColorLabel = QtGui.QLabel(self);
+        self.hairColorLabel.setText("Hair Color: ");
+        self.hairColorComboBox = QtGui.QComboBox(self);
+        self.addHairColorOptions();
 
     def addEyeColorOptions(self):
         self.eyeColorComboBox.addItem("Brown");
         self.eyeColorComboBox.addItem("Blue");
         self.eyeColorComboBox.addItem("Green");
 
+    def addHairColorOptions(self):
+        self.hairColorComboBox.addItem("Black");
+        self.hairColorComboBox.addItem("Brown");
+        self.hairColorComboBox.addItem("Blonde");
+        self.hairColorComboBox.addItem("Red");
 
 
     def superLike(self):
