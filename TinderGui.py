@@ -1,5 +1,6 @@
 import sys;
 import urllib;
+import json;
 
 from PyQt4 import QtGui, QtCore
 
@@ -28,7 +29,6 @@ class TinderGui(QtGui.QWidget):
     superLikesRemainingCounter = None;
 
     swipeInformationTextEdit = None;
-
 
 
     def __init__(self):
@@ -150,6 +150,8 @@ class TinderGui(QtGui.QWidget):
             self.superLikesRemainingCounter = result["remaining"];
             self.superLikeCounter += 1;
             self.handleSwipe();
+        else:
+            QtGui.QMessageBox.about(self, "Error super liking person", json.dumps(result,indent=4));
 
     def swipeRight(self):
         success, result = self.tinder.swipeRight(self.recommendations[0].personID);
@@ -158,6 +160,8 @@ class TinderGui(QtGui.QWidget):
             self.likesRemainingCounter = result["likes_remaining"];
             self.likeCounter += 1;
             self.handleSwipe();
+        else:
+            QtGui.QMessageBox.about(self, "Error liking person", json.dumps(result,indent=4));
 
     def swipeLeft(self):
         success, result = self.tinder.swipeLeft(self.recommendations[0].personID);
@@ -165,6 +169,8 @@ class TinderGui(QtGui.QWidget):
         if success:
             self.rejectCounter += 1;
             self.handleSwipe();
+        else:
+            QtGui.QMessageBox.about(self, "Error swiping left", json.dumps(result,indent=4));
 
     def handleSwipe(self):
         if len(self.recommendations) == 1:
