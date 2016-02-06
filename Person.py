@@ -101,6 +101,10 @@ class Person:
 
     def getCommonLikes(self):
         result = "";
+        if 'common_likes' not in self.jsonData:
+            print("NO COMMON LIKES: " + str(json.dumps(self.jsonData, indent=4)))
+            return result;
+
         likes = self.jsonData['common_likes'];
         for like in likes:
             result = like['name'] + " " + result;
