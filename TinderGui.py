@@ -16,9 +16,10 @@ class TinderGui(QtGui.QWidget):
     swipeLeftButton = None;
     superLikeButton = None;
 
-    personDescriptionTextEdit = None;
-    photoIndex = None;
     currentImageLabel = None;
+    personDescriptionTextEdit = None;
+
+    photoIndex = None;
 
     def __init__(self):
         super(TinderGui, self).__init__();
@@ -39,26 +40,28 @@ class TinderGui(QtGui.QWidget):
         self.displayPhoto();
         self.displayInformation();
 
-        mainLayout = QtGui.QHBoxLayout()
-        mainLayout.addStretch(1)
-        
-        mainSplit = QtGui.QSplitter(QtCore.Qt.Vertical);
-        mainSplit.addWidget(self.swipeLeftButton);
-        mainSplit.addWidget(self.swipeRightButton);
-        mainSplit.addWidget(self.superLikeButton);
-        mainSplit.addWidget(self.personDescriptionTextEdit);
+        buttonSection = QtGui.QSplitter(QtCore.Qt.Horizontal)
+        buttonSection.addWidget(self.swipeLeftButton);
+        buttonSection.addWidget(self.swipeRightButton);
+        buttonSection.addWidget(self.superLikeButton);
 
-        imageSplit = QtGui.QSplitter(QtCore.Qt.Horizontal);
-        imageSplit.addWidget(mainSplit);
-        imageSplit.addWidget(self.currentImageLabel);
+        middleSection = QtGui.QSplitter(QtCore.Qt.Vertical)
+        middleSection.addWidget(self.currentImageLabel);
+        middleSection.addWidget(buttonSection);
 
-        mainLayout.addWidget(imageSplit);
-        self.setLayout(mainLayout)
+        mainLayout = QtGui.QSplitter(QtCore.Qt.Horizontal)
+        mainLayout.addWidget(self.personDescriptionTextEdit);
+        mainLayout.addWidget(middleSection);
+        mainLayout.adjustSize();
+
+        vbox = QtGui.QVBoxLayout(self)
+        vbox.addWidget(mainLayout)
+        self.setLayout(vbox)
 
         self.setWindowTitle('Tinder Bot');
         self.setWindowIcon(QtGui.QIcon('tinder_icon.png'));
 
-        self.resize(800, 800);
+        self.resize(1000, 800);
         self.center();
         self.show()
         
@@ -99,7 +102,7 @@ class TinderGui(QtGui.QWidget):
     def displayInformation(self):
         person = self.recommendations[0];
 
-        result = person.getName() + "\n" + person.getBirthDate() + "\n" + person.getDistance() + "\n" + person.getBio() + "\n" + person.getCommonConnections() + "\n" + person.getCommonInterests() + "\n" + person.getCommonLikes() + "\n" + person.getCommonFriends() + "\n" + person.getSchools() + "\n" + person.getJobs();
+        result = person.getName() + "\n\n" + person.getBirthDate() + "\n\n" + person.getDistance() + " Miles" + "\n\n" + person.getBio() + "\n\n" + person.getCommonConnections() + "\n\n" + person.getCommonInterests() + "\n\n" + person.getCommonLikes() + "\n\n" + person.getCommonFriends() + "\n\n" + person.getSchools() + "\n\n" + person.getJobs();
         self.personDescriptionTextEdit.setText(result);
 
     def createUIComponents(self):
