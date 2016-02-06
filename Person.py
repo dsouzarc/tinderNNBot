@@ -112,6 +112,11 @@ class Person:
 
     def getCommonFriends(self):
         result = "";
+
+        if 'common_friends' not in self.jsonData:
+            print("NO COMMON FRIENDS: " + str(json.dumps(self.jsonData, indent=4)))
+            return result;
+
         friends = self.jsonData['common_friends'];
         for friend in friends:
             result = friend['name'] + " " + result;
