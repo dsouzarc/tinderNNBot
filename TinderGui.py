@@ -21,10 +21,26 @@ class TinderGui(QtGui.QWidget):
 
     photoIndex = None;
 
+    rejectCounter = None;
+    likeCounter = None;
+    superLikeCounter = None;
+    likesRemainingCounter = None;
+    superLikesRemainingCounter = None;
+
+    swipeInformationTextEdit = None;
+
+
+
     def __init__(self):
         super(TinderGui, self).__init__();
 
         self.photoIndex = 0;
+        self.rejectCounter = 0;
+        self.likeCounter = 0;
+        self.superLikeCounter = 0;
+        self.likesRemainingCounter = 50;
+        self.superLikesRemainingCounter = 3;
+
         self.tinder = Tinder(fileName="credentials.json");
         self.recommendations = self.tinder.getRecommendations();
 
@@ -49,9 +65,13 @@ class TinderGui(QtGui.QWidget):
         middleSection.addWidget(self.currentImageLabel);
         middleSection.addWidget(buttonSection);
 
+        rightSection = QtGui.QSplitter(QtCore.Qt.Vertical);
+        rightSection.addWidget(self.swipeInformationTextEdit);
+
         mainLayout = QtGui.QSplitter(QtCore.Qt.Horizontal)
         mainLayout.addWidget(self.personDescriptionTextEdit);
         mainLayout.addWidget(middleSection);
+        mainLayout.addWidget(rightSection);
         mainLayout.adjustSize();
 
         vbox = QtGui.QVBoxLayout(self)
@@ -65,7 +85,7 @@ class TinderGui(QtGui.QWidget):
         self.center();
         self.show()
         
-    def keyPressEvent (self, eventQKeyEvent):
+    def keyPressEvent(self, eventQKeyEvent):
         QtGui.QWidget.keyPressEvent(self, eventQKeyEvent)
 
         key = eventQKeyEvent.key();
@@ -119,17 +139,32 @@ class TinderGui(QtGui.QWidget):
         self.personDescriptionTextEdit = QtGui.QTextEdit();
         self.personDescriptionTextEdit.setEnabled(False);
 
+        self.swipeInformationTextEdit = QtGui.QTextEdit();
+        self.swipeInformationTextEdit.setEnabled(False);
+
     def superLike(self):
-        self.tinder.superLike(self.recommendations[0].personID);
-        self.handleSwipe();
+        success, result = self.tinder.superLike(self.recommendations[0].personID);
+
+        if success:
+            result = result["super_likes"];
+            self.superLikesRemainingCounter = result["remaining"];
+            self.superLikeCounter += 1;
+            self.handleSwipe();
 
     def swipeRight(self):
-        self.tinder.swipeRight(self.recommendations[0].personID);
-        self.handleSwipe();
+        success, result = self.tinder.swipeRight(self.recommendations[0].personID);
+
+        if success:
+            self.likesRemainingCounter = result["likes_remaining"];
+            self.likeCounter += 1;
+            self.handleSwipe();
 
     def swipeLeft(self):
-        self.tinder.swipeLeft(self.recommendations[0].personID);
-        self.handleSwipe();
+        success, result = self.tinder.swipeLeft(self.recommendations[0].personID);
+
+        if success:
+            self.rejectCounter += 1;
+            self.handleSwipe();
 
     def handleSwipe(self):
         if len(self.recommendations) == 1:
@@ -138,7 +173,16 @@ class TinderGui(QtGui.QWidget):
             self.recommendations = self.recommendations[1:];
         self.displayPhoto();
         self.displayInformation();
+        self.displaySwipeInformation();
 
+
+    def displaySwipeInformation(self):
+        result = "Rejected: " + str(self.rejectCounter) + "\n\n" + \
+                "Liked: " + str(self.likeCounter) + "\n\n" + \
+                "Likes Remaining: " + str(self.likesRemainingCounter) + "\n\n" + \
+                "Super Liked: " + str(self.superLikeCounter) + "\n\n" + \
+                "Super Likes Remaining: " + str(self.superLikesRemainingCounter);
+        self.swipeInformationTextEdit.setText(result);
 
     '''
     def closeEvent(self, event):
