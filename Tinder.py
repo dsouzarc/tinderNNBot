@@ -84,10 +84,10 @@ class Tinder:
         result = self.session.get(url,headers=self.headers,proxies=None);
 
         if result.status_code == 200:
-            return result.json();
+            return (True, result.json());
         else:
             print("ERROR LIKING PERSON: " + personId + "\t" + result.text);
-            return result;
+            return (False, result.text);
 
 
     '''
@@ -98,7 +98,16 @@ class Tinder:
         result = self.session.post(url, headers=self.headers,proxies=None);
 
         print(result.text);
+        if result.status_code == 200:
+            result = result.json();
+            if 'limit_exceeded' in result:
+                if bool(result['limit_exceeded']):
+                    return (False, result);
+            return (True, result);
 
+        else:
+            print("ERROR SUPER LIKING PERSON: " + personId + "\t" + result.text)
+            return (False, result.text);
 
     '''
     Swiping left - pass
@@ -108,10 +117,10 @@ class Tinder:
         result = self.session.get(url,headers=self.headers,proxies=None);
 
         if result.status_code == 200:
-            return True;
+            return (True, result.json())
         else:
             print("ERROR PASSING PERSON: " + personId + "\t" + result.text);
-            return False;
+            return (False, result.text)
 
 
     '''
