@@ -1,12 +1,13 @@
 import sys;
 import urllib;
 import json;
+import cv2;
+from PIL import Image
 
 from PyQt4 import QtGui, QtCore
 
 from Tinder import Tinder;
 from Person import Person;
-
 
 class TinderGui(QtGui.QWidget):
 
@@ -109,15 +110,39 @@ class TinderGui(QtGui.QWidget):
                 self.photoIndex = 0;
             self.displayPhoto();
 
+    def handleFacialRecognition(self, imageData):
+        imageName = 'picture.png'
+        cascPath = 'haarcascade_frontalface_default.xml'
+
+        f = open(imageName, 'wb');
+        f.write(imageData);
+        f.close();
+
+        faceCascade = cv2.CascadeClassifier(cascPath)
+        image = cv2.imread(imageName, cv2.IMREAD_UNCHANGED);
+
+        #Scale factor = 1.1 b/c faces closer to camera are bigger than ones in back
+        faces = faceCascade.detectMultiScale(image, scaleFactor=1.2, minNeighbors=1, minSize=(30,30), flags = cv2.cv.CV_HAAR_SCALE_IMAGE)
+
+        print("FOUND {0} IMAGES".format(len(faces)))
+
+        for (x, y, w, h) in faces:
+            cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        cv2.imwrite(imageName, image);
+
+        return QtGui.QPixmap(imageName);
+
 
     def displayPhoto(self):
         url = self.recommendations[0].photos[self.photoIndex];
         data = urllib.urlopen(url).read();
 
-        image = QtGui.QImage()
-        image.loadFromData(data)
+        openCVImage  = self.handleFacialRecognition(data);
 
-        self.currentImageLabel.setPixmap(QtGui.QPixmap(image))
+        #image = QtGui.QImage()
+        #image.loadFromData(data)
+
+        self.currentImageLabel.setPixmap(openCVImage);
 
     def displayInformation(self):
         person = self.recommendations[0];
