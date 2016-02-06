@@ -97,7 +97,6 @@ class Tinder:
         url = "https://api.gotinder.com/like/" + personId + "/super/";
         result = self.session.post(url, headers=self.headers,proxies=None);
 
-        print(result.text);
         if result.status_code == 200:
             result = result.json();
             if 'limit_exceeded' in result:
