@@ -39,6 +39,13 @@ class TinderGui(QtGui.QWidget):
     hairColorComboBox = None;
 
 
+
+    ###########################################################
+    #                                                         #
+    #               UI + GLOBAL VARIABLE SET UP               #
+    #                                                         #  
+    ###########################################################
+
     def __init__(self):
         super(TinderGui, self).__init__();
 
@@ -201,6 +208,13 @@ class TinderGui(QtGui.QWidget):
         self.hairColorComboBox.addItem("Brown");
         self.hairColorComboBox.addItem("Blonde");
         self.hairColorComboBox.addItem("Red");
+
+
+    ###########################################################
+    #                                                         #
+    #               LISTENERS                                 #
+    #                                                         #  
+    ###########################################################
 
     def changedEyeColor(self, text):
         print("Changed to: " + text);
