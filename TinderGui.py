@@ -109,48 +109,12 @@ class TinderGui(QtGui.QWidget):
         self.center();
         self.show()
         
-    def keyPressEvent(self, eventQKeyEvent):
-        QtGui.QWidget.keyPressEvent(self, eventQKeyEvent)
-
-        key = eventQKeyEvent.key();
-
-        if key == QtCore.Qt.Key_Left:
-            self.swipeLeft();
-        elif key == QtCore.Qt.Key_Right:
-            self.swipeRight();
-        elif key == QtCore.Qt.Key_S:
-            self.superLike();
-
-        elif key == QtCore.Qt.Key_Up:
-            self.photoIndex -= 1;
-            if self.photoIndex < 0:
-                self.photoIndex = len(self.recommendations[0].photos) - 1;
-            self.displayPhoto();
-
-        elif key == QtCore.Qt.Key_Down:
-            self.photoIndex += 1;
-            if self.photoIndex >= len(self.recommendations[0].photos):
-                self.photoIndex = 0;
-            self.displayPhoto();
-
-    def handleFacialRecognition(self, imageData):
-        imageName = 'picture.png'
-        cascPath = 'haarcascade_frontalface_default.xml'
-
-        faceCascade = cv2.CascadeClassifier(cascPath)
-        image = numpy.asarray(bytearray(imageData), dtype="uint8")
-        image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-
-        #Scale factor = 1.1 b/c faces closer to camera are bigger than ones in back
-        faces = faceCascade.detectMultiScale(image, scaleFactor=1.4, minNeighbors=1, minSize=(80,80), flags = cv2.cv.CV_HAAR_SCALE_IMAGE)
-
-        for (x, y, w, h) in faces:
-            cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        cv2.imwrite(imageName, image);
-
-
-        return QtGui.QPixmap(imageName);
-
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QtGui.QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+        
 
     def displayPhoto(self):
         url = self.recommendations[0].photos[self.photoIndex];
@@ -198,6 +162,14 @@ class TinderGui(QtGui.QWidget):
         self.hairColorComboBox.activated[str].connect(self.changedHairColor);
         self.addHairColorOptions();
 
+    def displaySwipeInformation(self):
+        result = "Rejected: " + str(self.rejectCounter) + "\n\n" + \
+                "Liked: " + str(self.likeCounter) + "\n\n" + \
+                "Likes Remaining: " + str(self.likesRemainingCounter) + "\n\n" + \
+                "Super Liked: " + str(self.superLikeCounter) + "\n\n" + \
+                "Super Likes Remaining: " + str(self.superLikesRemainingCounter);
+        self.swipeInformationTextEdit.setText(result);
+
     def addEyeColorOptions(self):
         self.eyeColorComboBox.addItem("Brown");
         self.eyeColorComboBox.addItem("Blue");
@@ -216,12 +188,38 @@ class TinderGui(QtGui.QWidget):
     #                                                         #  
     ###########################################################
 
-    def changedEyeColor(self, text):
-        print("Changed to: " + text);
+    def keyPressEvent(self, eventQKeyEvent):
+        QtGui.QWidget.keyPressEvent(self, eventQKeyEvent)
 
-    def changedHairColor(self):
-        print("Changed to: " + text);
+        key = eventQKeyEvent.key();
 
+        if key == QtCore.Qt.Key_Left:
+            self.swipeLeft();
+        elif key == QtCore.Qt.Key_Right:
+            self.swipeRight();
+        elif key == QtCore.Qt.Key_S:
+            self.superLike();
+
+        elif key == QtCore.Qt.Key_Up:
+            self.photoIndex -= 1;
+            if self.photoIndex < 0:
+                self.photoIndex = len(self.recommendations[0].photos) - 1;
+            self.displayPhoto();
+
+        elif key == QtCore.Qt.Key_Down:
+            self.photoIndex += 1;
+            if self.photoIndex >= len(self.recommendations[0].photos):
+                self.photoIndex = 0;
+            self.displayPhoto();
+
+    def handleSwipe(self):
+        if len(self.recommendations) == 1:
+            self.recommendations = self.tinder.getRecommendations();
+        else:
+            self.recommendations = self.recommendations[1:];
+        self.displayPhoto();
+        self.displayInformation();
+        self.displaySwipeInformation();
 
     def superLike(self):
         success, result = self.tinder.superLike(self.recommendations[0].personID);
@@ -253,23 +251,31 @@ class TinderGui(QtGui.QWidget):
         else:
             QtGui.QMessageBox.about(self, "Error swiping left", json.dumps(result,indent=4));
 
-    def handleSwipe(self):
-        if len(self.recommendations) == 1:
-            self.recommendations = self.tinder.getRecommendations();
-        else:
-            self.recommendations = self.recommendations[1:];
-        self.displayPhoto();
-        self.displayInformation();
-        self.displaySwipeInformation();
+
+    def changedEyeColor(self, text):
+        print("Changed to: " + text);
+
+    def changedHairColor(self):
+        print("Changed to: " + text);
+
+    def handleFacialRecognition(self, imageData):
+        imageName = 'picture.png'
+        cascPath = 'haarcascade_frontalface_default.xml'
+
+        faceCascade = cv2.CascadeClassifier(cascPath)
+        image = numpy.asarray(bytearray(imageData), dtype="uint8")
+        image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+
+        #Scale factor = 1.1 b/c faces closer to camera are bigger than ones in back
+        faces = faceCascade.detectMultiScale(image, scaleFactor=1.4, minNeighbors=1, minSize=(80,80), flags = cv2.cv.CV_HAAR_SCALE_IMAGE)
+
+        for (x, y, w, h) in faces:
+            cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        cv2.imwrite(imageName, image);
 
 
-    def displaySwipeInformation(self):
-        result = "Rejected: " + str(self.rejectCounter) + "\n\n" + \
-                "Liked: " + str(self.likeCounter) + "\n\n" + \
-                "Likes Remaining: " + str(self.likesRemainingCounter) + "\n\n" + \
-                "Super Liked: " + str(self.superLikeCounter) + "\n\n" + \
-                "Super Likes Remaining: " + str(self.superLikesRemainingCounter);
-        self.swipeInformationTextEdit.setText(result);
+        return QtGui.QPixmap(imageName);
+
 
     '''
     def closeEvent(self, event):
@@ -283,12 +289,6 @@ class TinderGui(QtGui.QWidget):
             event.ignore()        
     '''
 
-    def center(self):
-        qr = self.frameGeometry()
-        cp = QtGui.QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
-        
 
 def main():
     app = QtGui.QApplication(sys.argv);
