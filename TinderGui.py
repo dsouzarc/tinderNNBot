@@ -80,17 +80,10 @@ class TinderGui(QtGui.QWidget):
         middleSection.addWidget(self.currentImageLabel);
         middleSection.addWidget(buttonSection);
 
-        eyeColorSection = QtGui.QSplitter(Qt.Horizontal);
-        eyeColorSection.addWidget(self.eyeColorLabel);
-        eyeColorSection.addWidget(self.eyeColorComboBox);
-
-        hairColorSection = QtGui.QSplitter(Qt.Horizontal);
-        hairColorSection.addWidget(self.hairColorLabel);
-        hairColorSection.addWidget(self.hairColorComboBox);
-
         rightSection = QtGui.QSplitter(QtCore.Qt.Vertical);
+        #rightSection.addWidget(eyeColorSection);
+        #rightSection.addWidget(hairColorSection);
         rightSection.addWidget(self.swipeInformationTextEdit);
-        rightSection.addWidget(eyeColorSection);
 
         mainLayout = QtGui.QSplitter(QtCore.Qt.Horizontal)
         mainLayout.addWidget(self.personDescriptionTextEdit);
@@ -150,6 +143,7 @@ class TinderGui(QtGui.QWidget):
         self.swipeInformationTextEdit = QtGui.QTextEdit();
         self.swipeInformationTextEdit.setEnabled(False);
 
+        '''
         self.eyeColorLabel = QtGui.QLabel(self);
         self.eyeColorLabel.setText("Eye Color: ");
         self.eyeColorComboBox = QtGui.QComboBox(self);
@@ -161,6 +155,7 @@ class TinderGui(QtGui.QWidget):
         self.hairColorComboBox = QtGui.QComboBox(self);
         self.hairColorComboBox.activated[str].connect(self.changedHairColor);
         self.addHairColorOptions();
+        '''
 
     def displaySwipeInformation(self):
         result = "Rejected: " + str(self.rejectCounter) + "\n\n" + \
@@ -255,7 +250,7 @@ class TinderGui(QtGui.QWidget):
     def changedEyeColor(self, text):
         print("Changed to: " + text);
 
-    def changedHairColor(self):
+    def changedHairColor(self, text):
         print("Changed to: " + text);
 
     def handleFacialRecognition(self, imageData):
