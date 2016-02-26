@@ -38,6 +38,10 @@ class TinderGui(QtGui.QWidget):
     hairColorLabel = None;
     hairColorComboBox = None;
 
+    likedIDs = [];
+    superLikedIDs = [];
+    passedIDs = [];
+
 
 
     ###########################################################
@@ -220,6 +224,7 @@ class TinderGui(QtGui.QWidget):
         success, result = self.tinder.superLike(self.recommendations[0].personID);
 
         if success:
+            self.superLikedIDs.append(self.recommendations[0].personID)
             result = result["super_likes"];
             self.superLikesRemainingCounter = result["remaining"];
             self.superLikeCounter += 1;
@@ -231,6 +236,7 @@ class TinderGui(QtGui.QWidget):
         success, result = self.tinder.swipeRight(self.recommendations[0].personID);
 
         if success:
+            self.likedIDs.append(self.recommendations[0].personID)
             self.likesRemainingCounter = result["likes_remaining"];
             self.likeCounter += 1;
             self.handleSwipe();
@@ -241,6 +247,7 @@ class TinderGui(QtGui.QWidget):
         success, result = self.tinder.swipeLeft(self.recommendations[0].personID);
 
         if success:
+            self.passedIDs.append(self.recommendations[0].personID)
             self.rejectCounter += 1;
             self.handleSwipe();
         else:
