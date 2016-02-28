@@ -280,7 +280,22 @@ class TinderGui(QtGui.QWidget):
         return QtGui.QPixmap(imageName);
 
     def saveData(self):
-        print("yo")
+        
+        if len(savedSupers) == 0 and len(savedLikes) == 0 and len(savedPasses == 0):
+            return
+
+        savedSupers = json.load(open('superLikes.json'))
+        savedLikes = json.load(open('savedLikes.json'))
+        savedPasses = json.load(open('savedPasses.json'))
+
+        savedSupers.append(self.superLikedIDs)
+        savedLikes.append(self.likedIDs)
+        savedPasses.append(self.passedIDs)
+
+        json.dump(savedSupers, open('superLikes.json', 'w'), indent=4)
+        json.dump(savedLikes, open('savedLikes.json', 'w'), indent=4)
+        json.dump(savedPasses, open('savedPasses.json', 'w'), indent=4)
+
 
     def exitHandler(self):
         self.saveData()
