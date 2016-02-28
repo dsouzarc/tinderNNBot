@@ -101,6 +101,7 @@ class TinderGui(QtGui.QWidget):
 
         self.setWindowTitle('Tinder Bot');
         self.setWindowIcon(QtGui.QIcon('tinder_icon.png'));
+        self.aboutToQuit.connect(exitHandler)
 
         self.resize(1000, 800);
         self.center();
@@ -278,9 +279,16 @@ class TinderGui(QtGui.QWidget):
 
         return QtGui.QPixmap(imageName);
 
+    def saveData(self):
+        print("yo")
 
-    '''
+    def exitHandler(self):
+        self.saveData()
+
     def closeEvent(self, event):
+        self.saveData()
+
+        '''
         reply = QtGui.QMessageBox.question(self, 'Message',
             "Are you sure to quit?", QtGui.QMessageBox.Yes | 
             QtGui.QMessageBox.No, QtGui.QMessageBox.No)
@@ -289,7 +297,7 @@ class TinderGui(QtGui.QWidget):
             event.accept()
         else:
             event.ignore()        
-    '''
+        '''
 
 
 def main():
