@@ -69,6 +69,10 @@ class TinderGui(QtGui.QWidget):
 
         self.initUI();
 
+
+    '''
+    Setup the UI - adds the buttons and sections
+    '''
     def initUI(self):
 
         self.createUIComponents();
@@ -107,6 +111,10 @@ class TinderGui(QtGui.QWidget):
         self.center();
         self.show()
         
+
+    '''
+    Centers our GUI in the computer frame
+    '''
     def center(self):
         qr = self.frameGeometry()
         cp = QtGui.QDesktopWidget().availableGeometry().center()
@@ -114,6 +122,9 @@ class TinderGui(QtGui.QWidget):
         self.move(qr.topLeft())
         
 
+    '''
+    Handles displaying a person's photo - includes facial recognition aspect
+    '''
     def displayPhoto(self):
         url = self.recommendations[0].photos[self.photoIndex];
         data = urllib.urlopen(url).read();
@@ -125,12 +136,20 @@ class TinderGui(QtGui.QWidget):
 
         self.currentImageLabel.setPixmap(openCVImage);
 
+
+    '''
+    Displays Tinder's information about that person - job, interests, mutual friends
+    '''
     def displayInformation(self):
         person = self.recommendations[0];
 
         result = person.getName() + "\n\n" + person.getBirthDate() + "\n\n" + person.getDistance() + " Miles" + "\n\n" + person.getBio() + "\n\n" + person.getCommonConnections() + "\n\n" + person.getCommonInterests() + "\n\n" + person.getCommonLikes() + "\n\n" + person.getCommonFriends() + "\n\n" + person.getSchools() + "\n\n" + person.getJobs();
         self.personDescriptionTextEdit.setText(result);
 
+    
+    '''
+    Creates the actual UI components
+    '''
     def createUIComponents(self):
         self.currentImageLabel = QtGui.QLabel(self)
 
@@ -162,6 +181,10 @@ class TinderGui(QtGui.QWidget):
         self.addHairColorOptions();
         '''
 
+    
+    '''
+    Updates display of swipe information 
+    '''
     def displaySwipeInformation(self):
         result = "Rejected: " + str(self.rejectCounter) + "\n\n" + \
                 "Liked: " + str(self.likeCounter) + "\n\n" + \
@@ -170,16 +193,25 @@ class TinderGui(QtGui.QWidget):
                 "Super Likes Remaining: " + str(self.superLikesRemainingCounter);
         self.swipeInformationTextEdit.setText(result);
 
+
+    '''
+    Options for eye color - trains neural net
+    '''
     def addEyeColorOptions(self):
         self.eyeColorComboBox.addItem("Brown");
         self.eyeColorComboBox.addItem("Blue");
         self.eyeColorComboBox.addItem("Green");
 
+
+    '''
+    Options for hair color - trains neural net
+    '''
     def addHairColorOptions(self):
         self.hairColorComboBox.addItem("Black");
         self.hairColorComboBox.addItem("Brown");
         self.hairColorComboBox.addItem("Blonde");
         self.hairColorComboBox.addItem("Red");
+
 
 
     ###########################################################
@@ -188,6 +220,10 @@ class TinderGui(QtGui.QWidget):
     #                                                         #  
     ###########################################################
 
+
+    '''
+    Listener for swipes and going through photos
+    '''
     def keyPressEvent(self, eventQKeyEvent):
         QtGui.QWidget.keyPressEvent(self, eventQKeyEvent)
 
