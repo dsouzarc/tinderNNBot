@@ -248,6 +248,10 @@ class TinderGui(QtGui.QWidget):
                 self.photoIndex = 0;
             self.displayPhoto();
 
+
+    '''
+    Handles a swipe 
+    '''
     def handleSwipe(self):
         if len(self.recommendations) == 1:
             self.recommendations = self.tinder.getRecommendations();
@@ -257,6 +261,10 @@ class TinderGui(QtGui.QWidget):
         self.displayInformation();
         self.displaySwipeInformation();
 
+
+    '''
+    Handles super-liking 
+    '''
     def superLike(self):
         success, result = self.tinder.superLike(self.recommendations[0].personID);
 
@@ -269,6 +277,10 @@ class TinderGui(QtGui.QWidget):
         else:
             QtGui.QMessageBox.about(self, "Error super liking person", json.dumps(result,indent=4));
 
+
+    '''
+    Handles liking - regular swipe 
+    '''
     def swipeRight(self):
         success, result = self.tinder.swipeRight(self.recommendations[0].personID);
 
@@ -280,6 +292,10 @@ class TinderGui(QtGui.QWidget):
         else:
             QtGui.QMessageBox.about(self, "Error liking person", json.dumps(result,indent=4));
 
+
+    '''
+    Handles passing - left swipe
+    '''
     def swipeLeft(self):
         success, result = self.tinder.swipeLeft(self.recommendations[0].personID);
 
@@ -291,12 +307,23 @@ class TinderGui(QtGui.QWidget):
             QtGui.QMessageBox.about(self, "Error swiping left", json.dumps(result,indent=4));
 
 
+    '''
+    Detects eye color change
+    '''
     def changedEyeColor(self, text):
         print("Changed to: " + text);
 
+
+    '''
+    Detects hair color change
+    '''
     def changedHairColor(self, text):
         print("Changed to: " + text);
 
+
+    '''
+    Responsible for facial recognition - returns image with face detected
+    '''
     def handleFacialRecognition(self, imageData):
         imageName = 'picture.png'
         cascPath = 'haarcascade_frontalface_default.xml'
@@ -315,6 +342,10 @@ class TinderGui(QtGui.QWidget):
 
         return QtGui.QPixmap(imageName);
 
+
+    '''
+    Saves the super like, like, and pass data to a file
+    '''
     def saveData(self):
         
         if len(savedSupers) == 0 and len(savedLikes) == 0 and len(savedPasses == 0):
