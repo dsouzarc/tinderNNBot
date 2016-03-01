@@ -351,17 +351,15 @@ class TinderGui(QtGui.QWidget):
         if len(savedSupers) == 0 and len(savedLikes) == 0 and len(savedPasses == 0):
             return
 
-        savedSupers = json.load(open('superLikes.json'))
-        savedLikes = json.load(open('savedLikes.json'))
-        savedPasses = json.load(open('savedPasses.json'))
+        fileName = "Saved Swipe Information.json"
 
-        savedSupers.append(self.superLikedIDs)
-        savedLikes.append(self.likedIDs)
-        savedPasses.append(self.passedIDs)
+        savedInformation = json.load(open(fileName))
 
-        json.dump(savedSupers, open('superLikes.json', 'w'), indent=4)
-        json.dump(savedLikes, open('savedLikes.json', 'w'), indent=4)
-        json.dump(savedPasses, open('savedPasses.json', 'w'), indent=4)
+        savedInformation["superLikes"].append(self.superLikedIDs)
+        savedInformation["likes"].append(self.likedIDs)
+        savedInformation["passes"].append(self.passedIDs)
+
+        json.dump(savedInformation, open(fileInformation, 'w'), indent=4)
 
 
     def exitHandler(self):
