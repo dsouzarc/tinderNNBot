@@ -33,6 +33,20 @@ class Person:
             self.personID = personJSON["personID"];
             self.swiped = personJSON["swiped"];
 
+    def getDataToSave(self):
+        data = {
+            "id": self.personID,
+            "photos": self.photos,
+            "name": self.name,
+            "distance": self.getDistance(),
+            "common_connections": self.getCommonConnections(),
+            "schools": self.getSchools(),
+            "jobs": self.getJobs(),
+            "mutual_friends": self.getCommonFriends()
+        }
+
+        return data
+
     def getPersonJSON(self):
         data = {
             "name": self.name,
@@ -42,12 +56,6 @@ class Person:
             "data": self.jsonData
         };
         return data;
-
-    def getCommonInterests(self):
-        interests = [];
-        for interest in self.jsonData["common_interests"]:
-            interests.append(interest["name"]);
-        return interests;
 
     def getInstagramPictures(self):
         pictures = [];

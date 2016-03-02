@@ -1,10 +1,12 @@
+import oss
 import sys;
 import urllib;
 import json;
+
 import cv2;
 import numpy
-from PIL import Image
 
+from PIL import Image
 from PyQt4 import QtGui, QtCore
 
 from Tinder import Tinder;
@@ -265,10 +267,10 @@ class TinderGui(QtGui.QWidget):
     Handles super-liking 
     '''
     def superLike(self):
-        success, result = self.tinder.superLike(self.recommendations[0].personID);
+        success, result = self.tinder.superLike(self.recommendations[0].personID)
 
         if success:
-            self.superLikedIDs.append(self.recommendations[0].personID)
+            self.superLikedIDs.append(self.recommendations[0].getDataToSave())
             result = result["super_likes"];
             self.superLikesRemainingCounter = result["remaining"];
             self.superLikeCounter += 1;
@@ -281,10 +283,10 @@ class TinderGui(QtGui.QWidget):
     Handles liking - regular swipe 
     '''
     def swipeRight(self):
-        success, result = self.tinder.swipeRight(self.recommendations[0].personID);
+        success, result = self.tinder.swipeRight(self.recommendations[0].personID)
 
         if success:
-            self.likedIDs.append(self.recommendations[0].personID)
+            self.likedIDs.append(self.recommendations[0].getDataToSave())
             self.likesRemainingCounter = result["likes_remaining"];
             self.likeCounter += 1;
             self.handleSwipe();
@@ -299,7 +301,7 @@ class TinderGui(QtGui.QWidget):
         success, result = self.tinder.swipeLeft(self.recommendations[0].personID);
 
         if success:
-            self.passedIDs.append(self.recommendations[0].personID)
+            self.passedIDs.append(self.recommendations[0].getDataToSave())
             self.rejectCounter += 1;
             self.handleSwipe();
         else:
@@ -372,11 +374,16 @@ class TinderGui(QtGui.QWidget):
         json.dump(savedInformation, open(fileName, 'w'), indent=4)
 
 
-    def exitHandler(self):
-        self.saveData()
-
+    '''
+    When the window is closed via click or application exit
+    '''
     def closeEvent(self, event):
         self.saveData()
+
+        try:
+            os.remove('picture.png')
+        except:
+            pass
 
         '''
         reply = QtGui.QMessageBox.question(self, 'Message',
@@ -398,4 +405,3 @@ def main():
 
 if __name__ == '__main__':
     main();
-   
