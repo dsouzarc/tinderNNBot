@@ -105,7 +105,6 @@ class TinderGui(QtGui.QWidget):
 
         self.setWindowTitle('Tinder Bot');
         self.setWindowIcon(QtGui.QIcon('tinder_icon.png'));
-        self.aboutToQuit.connect(exitHandler)
 
         self.resize(1000, 800);
         self.center();
@@ -348,18 +347,29 @@ class TinderGui(QtGui.QWidget):
     '''
     def saveData(self):
         
-        if len(savedSupers) == 0 and len(savedLikes) == 0 and len(savedPasses == 0):
-            return
-
         fileName = "Saved Swipe Information.json"
 
-        savedInformation = json.load(open(fileName))
+        try:
+            savedInformation = json.load(open(fileName))
+        except:
+            savedInformation = {}
 
-        savedInformation["superLikes"].append(self.superLikedIDs)
-        savedInformation["likes"].append(self.likedIDs)
-        savedInformation["passes"].append(self.passedIDs)
+        if "superLikes" in savedInformation:
+            savedInformation["superLikes"].extend(self.superLikedIDs)
+        else:
+            savedInformation["superLikes"] = self.superLikedIDs
 
-        json.dump(savedInformation, open(fileInformation, 'w'), indent=4)
+        if "likes" in savedInformation:
+            savedInformation["likes"].extend(self.likedIDs)
+        else:
+            savedInformation["likes"] = self.likedIDs
+
+        if "passes" in savedInformation:
+            savedInformation["passes"].extend(self.passedIDs)
+        else:
+            savedInformation["passes"] = self.passedIDs
+
+        json.dump(savedInformation, open(fileName, 'w'), indent=4)
 
 
     def exitHandler(self):
