@@ -139,8 +139,10 @@ class Tinder:
 
         if len(recommendations) == 0:
             print("TRYING AGAIN 0 RECOMMENDATIONS: " + result.text);
-            return self.getRecommendations();
-        return recommendations;
+            self.login()
+            return self.getRecommendations()
+        else:
+            return recommendations;
 
 
     '''

@@ -17,6 +17,7 @@ class TinderGui(QtGui.QWidget):
     tinder = None;
     recommendations = None;
 
+    middleSection = None;
     swipeRightButton = None;
     swipeLeftButton = None;
     superLikeButton = None;
@@ -86,18 +87,26 @@ class TinderGui(QtGui.QWidget):
         buttonSection.addWidget(self.swipeRightButton);
         buttonSection.addWidget(self.superLikeButton);
 
-        middleSection = QtGui.QSplitter(QtCore.Qt.Vertical)
-        middleSection.addWidget(self.currentImageLabel);
-        middleSection.addWidget(buttonSection);
+        self.middleSection = QtGui.QSplitter(QtCore.Qt.Vertical)
+        self.middleSection.addWidget(self.currentImageLabel);
+        self.middleSection.addWidget(buttonSection);
+
+        eyeColorSection = QtGui.QSplitter(QtCore.Qt.Horizontal);
+        eyeColorSection.addWidget(self.eyeColorLabel);
+        eyeColorSection.addWidget(self.eyeColorComboBox);
+
+        hairColorSection = QtGui.QSplitter(QtCore.Qt.Horizontal);
+        hairColorSection.addWidget(self.hairColorLabel);
+        hairColorSection.addWidget(self.hairColorComboBox);
 
         rightSection = QtGui.QSplitter(QtCore.Qt.Vertical);
-        #rightSection.addWidget(eyeColorSection);
-        #rightSection.addWidget(hairColorSection);
         rightSection.addWidget(self.swipeInformationTextEdit);
+        rightSection.addWidget(eyeColorSection);
+        rightSection.addWidget(hairColorSection);
 
         mainLayout = QtGui.QSplitter(QtCore.Qt.Horizontal)
         mainLayout.addWidget(self.personDescriptionTextEdit);
-        mainLayout.addWidget(middleSection);
+        mainLayout.addWidget(self.middleSection);
         mainLayout.addWidget(rightSection);
         mainLayout.adjustSize();
 
@@ -107,6 +116,8 @@ class TinderGui(QtGui.QWidget):
 
         self.setWindowTitle('Tinder Bot');
         self.setWindowIcon(QtGui.QIcon('tinder_icon.png'));
+
+        self.middleSection.setFocus()
 
         self.resize(1000, 800);
         self.center();
@@ -143,7 +154,6 @@ class TinderGui(QtGui.QWidget):
         self.swipeInformationTextEdit = QtGui.QTextEdit();
         self.swipeInformationTextEdit.setEnabled(False);
 
-        '''
         self.eyeColorLabel = QtGui.QLabel(self);
         self.eyeColorLabel.setText("Eye Color: ");
         self.eyeColorComboBox = QtGui.QComboBox(self);
@@ -155,7 +165,6 @@ class TinderGui(QtGui.QWidget):
         self.hairColorComboBox = QtGui.QComboBox(self);
         self.hairColorComboBox.activated[str].connect(self.changedHairColor);
         self.addHairColorOptions();
-        '''
 
 
     '''
@@ -211,6 +220,7 @@ class TinderGui(QtGui.QWidget):
     Handles displaying a person's photo - includes facial recognition aspect
     '''
     def displayPhoto(self):
+        
         url = self.recommendations[0].photos[self.photoIndex];
         data = urllib.urlopen(url).read();
 
@@ -266,9 +276,11 @@ class TinderGui(QtGui.QWidget):
             self.recommendations = self.tinder.getRecommendations();
         else:
             self.recommendations = self.recommendations[1:];
+
         self.displayPhoto();
         self.displayInformation();
         self.displaySwipeInformation();
+        self.middleSection.setFocus()
 
 
     '''
