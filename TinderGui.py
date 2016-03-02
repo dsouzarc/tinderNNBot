@@ -122,31 +122,6 @@ class TinderGui(QtGui.QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
         
-
-    '''
-    Handles displaying a person's photo - includes facial recognition aspect
-    '''
-    def displayPhoto(self):
-        url = self.recommendations[0].photos[self.photoIndex];
-        data = urllib.urlopen(url).read();
-
-        openCVImage  = self.handleFacialRecognition(data);
-
-        #image = QtGui.QImage()
-        #image.loadFromData(data)
-
-        self.currentImageLabel.setPixmap(openCVImage);
-
-
-    '''
-    Displays Tinder's information about that person - job, interests, mutual friends
-    '''
-    def displayInformation(self):
-        person = self.recommendations[0];
-
-        result = person.getName() + "\n\n" + person.getBirthDate() + "\n\n" + person.getDistance() + " Miles" + "\n\n" + person.getBio() + "\n\n" + person.getCommonConnections() + "\n\n" + person.getCommonInterests() + "\n\n" + person.getCommonLikes() + "\n\n" + person.getCommonFriends() + "\n\n" + person.getSchools() + "\n\n" + person.getJobs();
-        self.personDescriptionTextEdit.setText(result);
-
     
     '''
     Creates the actual UI components
@@ -182,6 +157,23 @@ class TinderGui(QtGui.QWidget):
         self.addHairColorOptions();
         '''
 
+
+    '''
+    Displays Tinder's information about that person - job, interests, mutual friends
+    '''
+    def displayInformation(self):
+        person = self.recommendations[0];
+
+        result = person.getName() + "\n\n" + person.getBirthDate() + "\n\n" + \
+                 person.getDistance() + " Miles" + "\n\n" + person.getBio() + \
+                 "\n\n" + person.getCommonConnections() + "\n\n" + \
+                 person.getCommonInterests() + "\n\n" + \
+                 person.getCommonLikes() + "\n\n" + \
+                 person.getCommonFriends() + "\n\n" + \
+                 person.getSchools() + "\n\n" + person.getJobs();
+
+        self.personDescriptionTextEdit.setText(result);
+
     
     '''
     Updates display of swipe information 
@@ -192,6 +184,7 @@ class TinderGui(QtGui.QWidget):
                 "Likes Remaining: " + str(self.likesRemainingCounter) + "\n\n" + \
                 "Super Liked: " + str(self.superLikeCounter) + "\n\n" + \
                 "Super Likes Remaining: " + str(self.superLikesRemainingCounter);
+
         self.swipeInformationTextEdit.setText(result);
 
 
@@ -212,6 +205,21 @@ class TinderGui(QtGui.QWidget):
         self.hairColorComboBox.addItem("Brown");
         self.hairColorComboBox.addItem("Blonde");
         self.hairColorComboBox.addItem("Red");
+
+
+    '''
+    Handles displaying a person's photo - includes facial recognition aspect
+    '''
+    def displayPhoto(self):
+        url = self.recommendations[0].photos[self.photoIndex];
+        data = urllib.urlopen(url).read();
+
+        openCVImage  = self.handleFacialRecognition(data);
+
+        #image = QtGui.QImage()
+        #image.loadFromData(data)
+
+        self.currentImageLabel.setPixmap(openCVImage);
 
 
 
@@ -345,9 +353,24 @@ class TinderGui(QtGui.QWidget):
 
 
     '''
+    When the window is closed via click or application exit
+    '''
+    def closeEvent(self, event):
+        self.saveData()
+
+        try:
+            os.remove('picture.png')
+        except:
+            pass
+
+
+    '''
     Saves the super like, like, and pass data to a file
     '''
     def saveData(self):
+
+        if len(self.superLikedIDs) == 0 and len(self.likedIDs) == 0 and len(self.passedIDs) == 0:
+            return
         
         fileName = "Saved Swipe Information.json"
 
@@ -373,28 +396,6 @@ class TinderGui(QtGui.QWidget):
 
         json.dump(savedInformation, open(fileName, 'w'), indent=4)
 
-
-    '''
-    When the window is closed via click or application exit
-    '''
-    def closeEvent(self, event):
-        self.saveData()
-
-        try:
-            os.remove('picture.png')
-        except:
-            pass
-
-        '''
-        reply = QtGui.QMessageBox.question(self, 'Message',
-            "Are you sure to quit?", QtGui.QMessageBox.Yes | 
-            QtGui.QMessageBox.No, QtGui.QMessageBox.No)
-
-        if reply == QtGui.QMessageBox.Yes:
-            event.accept()
-        else:
-            event.ignore()        
-        '''
 
 
 def main():
