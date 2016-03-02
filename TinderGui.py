@@ -1,4 +1,4 @@
-import oss
+import os;
 import sys;
 import urllib;
 import json;
