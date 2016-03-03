@@ -358,9 +358,8 @@ class TinderGui(QtGui.QWidget):
 
         for (x, y, w, h) in faces:
             cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
         cv2.imwrite(imageName, image);
-
-
         return QtGui.QPixmap(imageName);
 
 
