@@ -2,4 +2,5 @@ credentials.json
 *.pyc
 *.swo
 *.swp
+*.out
 picture.png
