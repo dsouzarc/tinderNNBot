@@ -345,19 +345,29 @@ class TinderGui(QtGui.QWidget):
     '''
     Responsible for facial recognition - returns image with face detected
     '''
-    def handleFacialRecognition(self, imageData):
+    def handleFacialRecognition(self, imageData, scaleFactor=1.4):
         imageName = 'picture.png'
-        cascPath = 'haarcascade_frontalface_default.xml'
+        faceCascadePath = 'haarcascade_frontalface_default.xml'
+        eyeCascadePath = 'haarcascade_eye.xml'
+        
+        faceCascade = cv2.CascadeClassifier(faceCascadePath)
+        eyeCacade = cv2.CascadeClassifier(eyeCascadePath)
 
-        faceCascade = cv2.CascadeClassifier(cascPath)
         image = numpy.asarray(bytearray(imageData), dtype="uint8")
         image = cv2.imdecode(image, cv2.IMREAD_COLOR)
 
         #Scale factor = 1.1 b/c faces closer to camera are bigger than ones in back
-        faces = faceCascade.detectMultiScale(image, scaleFactor=1.4, minNeighbors=1, minSize=(80,80), flags = cv2.cv.CV_HAAR_SCALE_IMAGE)
+        faces = faceCascade.detectMultiScale(image, scaleFactor=scaleFactor, minNeighbors=1, minSize=(80,80), flags = cv2.cv.CV_HAAR_SCALE_IMAGE)
 
         for (x, y, w, h) in faces:
             cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+            roi_gray = gray[y:y+h, x:x+w]
+            roi_color = img[y:y+h, x:x+w]
+            eyes = eyeCascade.detectMultiScale(roi_gray)
+            for (ex, ey, ew, eh) in eyes:
+                cv2.rectangle(roi_color, (ex, ey), (ex+ew, ey+eh), (0, 255, 0), 2)
+
 
         cv2.imwrite(imageName, image);
         return QtGui.QPixmap(imageName);
