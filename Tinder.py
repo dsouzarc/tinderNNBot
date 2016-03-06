@@ -149,6 +149,21 @@ class Tinder:
             return recommendations;
 
 
+    def metaCheck(self):
+        url = "https://api.gotinder.com/meta"
+        result = self.session.get(url, headers=self.headers, proxies=None)
+
+        if result.status_code == 200:
+            result = result.json()
+            
+            if "globals" in result and "user" in result:
+                return True
+
+        print("ERROR IN META CHECK")
+        print(json.dumps(result.json(), indent=4))
+        return False
+
+
     '''
     Log in to Tinder API
     '''
@@ -159,6 +174,35 @@ class Tinder:
             "facebook_id": self.facebookID,
             "facebook_token": self.facebookToken
         };
+        headers = self.generateHeaders()
+
+        url = "https://api.gotinder.com/auth";
+        result = self.session.post(url, data=json.dumps(payload), headers=headers, proxies=None);
+
+        if result.status_code == 200:
+
+            result = result.json();
+            self.tinderToken = result["token"];
+            self.tinderAPIToken = result["user"]["api_token"];
+            self.myName = result["user"]["full_name"];
+
+            headers["X-Auth-Token"] = self.tinderAPIToken;
+            headers["Authorization"] = 'Token token="%s"' % self.tinderAPIToken
+
+            self.headers = headers;
+            self.session.headers.update(self.headers);
+            print("Successful logged " + self.myName + " in with Tinder Token: " + self.tinderToken + "\tAPI Token: " + self.tinderAPIToken);
+            self.saveTokensToFile();
+        else:
+            print("Unsuccessful login");
+            print(json.dumps(result, indent=4));
+            raise errors.RequestError("Couldn't authenticate");
+        
+
+    '''
+    The headers used
+    '''
+    def generateHeaders(self):
         headers = {
             "Host": "api.gotinder.com",
             "host": "api.gotinder.com",
@@ -176,54 +220,10 @@ class Tinder:
             "os_version": "90000200001",
             "Content-Type": "application/json"
         };
-
-        url = "https://api.gotinder.com/auth";
-        result = self.session.post(url, data=json.dumps(payload), headers=headers, proxies=None);
-
-        if result.status_code == 200:
-            result = result.json();
-            self.tinderToken = result["token"];
-            print("OUR TOKEN: " + str(self.tinderToken))
-            self.tinderAPIToken = result["user"]["api_token"];
-            self.myName = result["user"]["full_name"];
-
-            headers["X-Auth-Token"] = self.tinderToken;
-            headers["Authorization"] = 'Token token="%s"' % self.tinderToken
-            print(headers["Authorization"])
-
-            self.headers = headers;
-            self.session.headers.update(headers);
-            print("Successful logged " + self.myName + " in with Tinder Token: " + self.tinderToken + "\tAPI Token: " + self.tinderAPIToken);
-            self.saveTokensToFile();
-        else:
-            print("Unsuccessful login");
-            print(json.dumps(result, indent=4));
-            raise errors.RequestError("Couldn't authenticate");
-        
-
-    '''
-    The headers used
-    '''
-    def generateHeaders(self):
-        headers = {
-            "Host": "api.gotinder.com",
-            "Accept": "*/*",
-            "app-version": "467",
-            "x-client-version": "47217",
-            "Proxy-Connection": "keep-alive",
-            "Accept-Encoding": "gzip, deflate",
-            "Accept-Language": "en-US;q=1",
-            "platform": "ios",
-            "Facebook-ID": self.facebookID,
-            "User-Agent": "Tinder/4.7.2 (iPhone; iOS 9.2; Scale/2.00)",
-            "If-None-Match": "2020547529",
-            "Connection": "keep-alive",
-            "os_version": "900002",
-            "Content-Type": "application/json charset=utf-8"
-        };
         return headers;
 
 
 if __name__ == "__main__":
     tinder = Tinder(fileName="credentials.json");
+    tinder.metaCheck()
     print(tinder.getRecommendations())
