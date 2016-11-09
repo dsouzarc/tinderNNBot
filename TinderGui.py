@@ -220,7 +220,9 @@ class TinderGui(QtGui.QWidget):
     Handles displaying a person's photo - includes facial recognition aspect
     '''
     def displayPhoto(self):
-        
+
+
+        self.photoIndex = 0;
         url = self.recommendations[0].photos[self.photoIndex];
         data = urllib.urlopen(url).read();
 
@@ -230,6 +232,26 @@ class TinderGui(QtGui.QWidget):
         #image.loadFromData(data)
 
         self.currentImageLabel.setPixmap(openCVImage);
+
+
+        '''
+        if len(self.recommendations) == 0:
+            self.recommendations = self.tinder.getRecommendations();
+
+        if len(self.recommendations[0].photos) > 0:
+            self.recommendations = self.recommendations[1:]
+            #self.displayPhoto();
+
+        url = self.recommendations[0].photos[self.photoIndex];
+        data = urllib.urlopen(url).read();
+
+        openCVImage  = self.handleFacialRecognition(data);
+
+        #image = QtGui.QImage()
+        #image.loadFromData(data)
+
+        self.currentImageLabel.setPixmap(openCVImage);
+        '''
 
 
 
