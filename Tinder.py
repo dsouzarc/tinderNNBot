@@ -84,7 +84,7 @@ class Tinder:
         result = self.session.get(url,headers=self.headers,proxies=None);
 
         if result.status_code == 200:
-            print("Like recorded")
+            print("Like recorded \t" + str(result.json()))
             return (True, result.json());
         else:
             print("ERROR LIKING PERSON: " + personId + "\t" + result.text);
@@ -103,7 +103,7 @@ class Tinder:
             if 'limit_exceeded' in result:
                 if bool(result['limit_exceeded']):
                     return (False, result);
-            print("Super-like recorded")
+            print("Super-like recorded \t" + str(result.json()))
             return (True, result);
 
         else:
@@ -134,11 +134,17 @@ class Tinder:
         result = self.session.post(url,headers=self.headers, proxies=None);
 
         if result.status_code == 200:
-            result = result.json();
-            if result["status"] == 200:
-                for person in result["results"]:
-                    recommendation = Person(person);
-                    recommendations.append(recommendation);
+            try:
+                result = result.json();
+                if result["status"] == 200:
+                    for person in result["results"]:
+                        recommendation = Person(person);
+                        recommendations.append(recommendation);
+            except TypeError:
+                print("NON-JSON RESPONSE - Might be login issue")
+                print(result.text)
+        elif result.status_code == 401:
+            print("LOGIN ERROR")
 
         if len(recommendations) == 0:
             print("TRYING AGAIN 0 RECOMMENDATIONS: " + result.text);
@@ -188,9 +194,18 @@ class Tinder:
             self.session.headers.update(headers);
             print("Successful logged " + self.myName + " in with Tinder Token: " + self.tinderToken + "\tAPI Token: " + self.tinderAPIToken);
             self.saveTokensToFile();
+        
+        elif result.status_code == 401:
+            print("INVALID USERNAME/PASSWORD - 401 Error Code");
+            print(result.text);
+
         else:
             print("Unsuccessful login");
-            print(json.dumps(result, indent=4));
+
+            try:
+                print(json.dumps(result, indent=4));
+            except TypeError:
+                print(result.text);
             raise errors.RequestError("Couldn't authenticate");
         
 
@@ -215,3 +230,27 @@ class Tinder:
             "Content-Type": "application/json charset=utf-8"
         };
         return headers;
+
+    def getMatches(self):
+        matchesURL = "https://api.gotinder.com/updates"
+        result = self.session.post(matchesURL, headers=self.headers, proxies=None)
+        result = result.json()
+        matches = result["matches"]
+        people = []
+        for match in matches:
+            if "person" in match:
+                person = Person(match["person"])
+                personInformationURL = "https://api.gotinder.com/user/" + person.personID
+                personResult = self.session.get(personInformationURL, headers=self.headers, proxies=None).json()
+
+                personResult = personResult["results"]
+                person = Person(personResult)
+                people.append(person)
+                print(person.name + "\t" + person.getSchools())
+
+
+if __name__ == "__main__":
+    tinder = Tinder(fileName="credentials.json")
+    tinder.getMatches()
+        
+
