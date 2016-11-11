@@ -66,7 +66,7 @@ class TinderGui(QtGui.QWidget):
         self.tinder = Tinder(fileName="credentials.json");
         self.recommendations = self.tinder.getRecommendations();
 
-        if len(self.recommendations) == 0:
+        if self.recommendations is None or len(self.recommendations) == 0:
             print("0 RECOMMENDATIONS")
             return;
 
