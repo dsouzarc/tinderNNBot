@@ -68,7 +68,7 @@ class TinderGui(QtGui.QWidget):
 
         if self.recommendations is None or len(self.recommendations) == 0:
             print("0 RECOMMENDATIONS")
-            return;
+            sys.exit(1);
 
         self.initUI();
 
@@ -405,7 +405,7 @@ class TinderGui(QtGui.QWidget):
 
         try:
             os.remove('picture.png')
-        except:
+        except Exception, e:
             pass
 
 
@@ -421,7 +421,7 @@ class TinderGui(QtGui.QWidget):
 
         try:
             savedInformation = json.load(open(fileName))
-        except:
+        except Exception, e:
             savedInformation = {}
 
         if "superLikes" in savedInformation:
