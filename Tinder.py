@@ -169,6 +169,8 @@ class Tinder:
                 else:
                     print("No recommendations - trying again")
 
+                return self.getRecommendations();
+
         else:
             return recommendations;
 
