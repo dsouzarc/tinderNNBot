@@ -146,20 +146,29 @@ class Tinder:
             except TypeError:
                 print("NON-JSON RESPONSE - Might be login issue")
                 print(result.text)
+
+        #Error logging in or no recommendations
         elif result.status_code == 401 or len(recommendations) == 0:
+
             self.errorCount += 1;
 
+            #Give up
             if self.errorCount > 5:
-                print("Too many login errors - quitting now")
-                sys.exit()
+
+                if result.status_code == 401:
+                    print("Too many login errors - quitting now")
+                else:
+                    print("Too many no recommendations - quitting now")
+
+                sys.exit();
+
             else:
-                print("Login Error")
 
-        if len(recommendations) == 0:
+                if result.status_code == 401:
+                    print("Login error - trying again")
+                else:
+                    print("No recommendations - trying again")
 
-            print("TRYING AGAIN 0 RECOMMENDATIONS: " + result.text);
-            #self.login()
-            return self.getRecommendations()
         else:
             return recommendations;
 
