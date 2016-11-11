@@ -3,6 +3,7 @@ from Person import Person
 import requests;
 import time;
 import json;
+import sys;
 
 class Tinder:
 
@@ -19,6 +20,8 @@ class Tinder:
 
     session = None;
     headers = None;
+
+    errorCount = 0;
 
 
     '''
@@ -143,10 +146,17 @@ class Tinder:
             except TypeError:
                 print("NON-JSON RESPONSE - Might be login issue")
                 print(result.text)
-        elif result.status_code == 401:
-            print("LOGIN ERROR")
+        elif result.status_code == 401 or len(recommendations) == 0:
+            self.errorCount += 1;
+
+            if self.errorCount > 5:
+                print("Too many login errors - quitting now")
+                sys.exit()
+            else:
+                print("Login Error")
 
         if len(recommendations) == 0:
+
             print("TRYING AGAIN 0 RECOMMENDATIONS: " + result.text);
             #self.login()
             return self.getRecommendations()
