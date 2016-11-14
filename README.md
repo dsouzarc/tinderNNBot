@@ -2,13 +2,13 @@
 
 ##A Tinder Bot - under construction
 
-Uses a neural network to figure out what you look for in a person (or what you don't look for - still under debate on which is more accurate) and performs those actions on Tinder.
+Analyzes the facial components of people you swipe for on Tinder.
 
-As of now, it's only a GUI that uses a Tinder API client I wrote to display a person's pictures and information from Tinder.
-Multiple pictures for that person can be viewed and facial recognition is performed on each image using OpenCV.
-Some information needs to be entered manually as facial recognition might not be accurate
+Uses OpenCV for facial recognition and identification of facial characteristics - some information still needs to be filled out manually though.
 
-The swipe information is stored to a file to be processed. 
+Uses Google's TensorFlow library for machine learning in determining the characteristics the user looks for.
+
+Uses PyQt for the GUI and Tinder's (unofficial) REST API. Swipe information is stored in a file to be processed.
 
 
 ---
