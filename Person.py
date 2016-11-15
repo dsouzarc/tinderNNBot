@@ -27,6 +27,7 @@ class Person:
                             self.photos.append(processedImage["url"]);
                 else:
                     self.photos.append(photo['url']);
+
         else:
             self.name = personJSON["name"];
             self.photos = personJSON["photos"];

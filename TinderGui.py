@@ -221,8 +221,6 @@ class TinderGui(QtGui.QWidget):
     '''
     def displayPhoto(self):
 
-
-        self.photoIndex = 0;
         url = self.recommendations[0].photos[self.photoIndex];
         data = urllib.urlopen(url).read();
 
@@ -279,8 +277,11 @@ class TinderGui(QtGui.QWidget):
 
         elif key == QtCore.Qt.Key_Up:
             self.photoIndex -= 1;
+            print("next photo: " + str(self.recommendations[0].photos))
             if self.photoIndex < 0:
+                print("Less than 1")
                 self.photoIndex = len(self.recommendations[0].photos) - 1;
+                print("NEW INDEX: " + str(self.photoIndex))
             self.displayPhoto();
 
         elif key == QtCore.Qt.Key_Down:
@@ -294,6 +295,9 @@ class TinderGui(QtGui.QWidget):
     Handles a swipe 
     '''
     def handleSwipe(self):
+
+        self.photoIndex = 0
+
         if len(self.recommendations) == 1:
             self.recommendations = self.tinder.getRecommendations();
         else:
