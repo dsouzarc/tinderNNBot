@@ -9,6 +9,8 @@ class Tinder:
 
     '''
     Handles all Tinder API calls 
+    Loads credential information from "credentials.json"
+    If the tokens are expired or missing, calls the API to renew the token
     '''
 
     credentialFileName = None;
@@ -44,6 +46,7 @@ class Tinder:
         #Valid token
         else:
             self.headers["X-Auth-Token"] = self.tinderToken;
+            self.headers["Authorization"] = 'Token token=' + self.tinderToken + ''
             print(self.myName + " Found Tinder Token: " + self.tinderToken);
 
 
@@ -133,16 +136,24 @@ class Tinder:
     '''
     def getRecommendations(self):
         recommendations = [];
-        url = "https://api.gotinder.com/user/recs?locale=en-US";
-        result = self.session.post(url,headers=self.headers, proxies=None);
+        url = "https://api.gotinder.com/recs/core?locale=en-US";
+
+        result = self.session.get(url,headers=self.headers, proxies=None);
 
         if result.status_code == 200:
             try:
                 result = result.json();
                 if result["status"] == 200:
-                    for person in result["results"]:
-                        recommendation = Person(person);
-                        recommendations.append(recommendation);
+
+                    #The people to swipe
+                    results = result["results"]
+                    for resultPerson in results:
+                        if resultPerson["type"] == "user":
+                            actualPerson = resultPerson["user"]
+                            recommendation = Person(actualPerson);
+                            recommendations.append(recommendation);
+                    return recommendations
+
             except TypeError:
                 print("NON-JSON RESPONSE - Might be login issue")
                 print(result.text)
@@ -150,27 +161,27 @@ class Tinder:
         #Error logging in or no recommendations
         elif result.status_code == 401 or len(recommendations) == 0:
 
+            print("RESPONSE: " + result.text)
             self.errorCount += 1;
 
             #Give up
             if self.errorCount > 5:
-
                 if result.status_code == 401:
                     print("Too many login errors - quitting now")
                 else:
                     print("Too many no recommendations - quitting now")
-
                 sys.exit();
 
             else:
-
                 if result.status_code == 401:
                     print("Login error - trying again")
                 else:
                     print("No recommendations - trying again")
 
+                #Recurse until we should give up
                 return self.getRecommendations();
 
+        #Got our recommendations
         else:
             return recommendations;
 
@@ -188,17 +199,16 @@ class Tinder:
         headers = {
             "Host": "api.gotinder.com",
             "Accept": "*/*",
-            "app-version": "467",
-            "x-client-version": "47217",
-            "Proxy-Connection": "keep-alive",
+            "app-version": "1798",
+            "x-client-version": "65010",
             "Accept-Encoding": "gzip, deflate",
             "Accept-Language": "en-US;q=1",
             "platform": "ios",
             "Facebook-ID": self.facebookID,
-            "User-Agent": "Tinder/4.7.2 (iPhone; iOS 9.2; Scale/2.00)",
-            "If-None-Match": "2020547529",
+            "User-Agent": "Tinder/6.5.0 (iPhone; iOS 10.1; Scale/2.00)",
+            "If-None-Match": 'W/"-330160069"',
             "Connection": "keep-alive",
-            "os_version": "900002",
+            "os_version": "1000001",
             "Content-Type": "application/json"
         };
 
@@ -207,12 +217,16 @@ class Tinder:
 
         if result.status_code == 200:
             result = result.json();
-            headers["X-Auth-Token"] = self.tinderToken;
             self.tinderToken = result["token"];
             self.tinderAPIToken = result["user"]["api_token"];
             self.myName = result["user"]["full_name"];
+
+            headers["X-Auth-Token"] = self.tinderToken;
+            headers["Authorization"] = 'Token token=' + self.tinderToken  
+
             self.headers = headers;
-            self.session.headers.update(headers);
+            self.session.headers.update(self.headers);
+
             print("Successful logged " + self.myName + " in with Tinder Token: " + self.tinderToken + "\tAPI Token: " + self.tinderAPIToken);
             self.saveTokensToFile();
         
@@ -237,18 +251,17 @@ class Tinder:
         headers = {
             "Host": "api.gotinder.com",
             "Accept": "*/*",
-            "app-version": "467",
-            "x-client-version": "47217",
-            "Proxy-Connection": "keep-alive",
+            "app-version": "1798",
+            "x-client-version": "65010",
             "Accept-Encoding": "gzip, deflate",
             "Accept-Language": "en-US;q=1",
             "platform": "ios",
             "Facebook-ID": self.facebookID,
-            "User-Agent": "Tinder/4.7.2 (iPhone; iOS 9.2; Scale/2.00)",
-            "If-None-Match": "2020547529",
+            "User-Agent": "Tinder/6.5.0 (iPhone; iOS 10.1; Scale/2.00)",
+            "If-None-Match": 'W/"-330160069"',
             "Connection": "keep-alive",
-            "os_version": "900002",
-            "Content-Type": "application/json charset=utf-8"
+            "os_version": "1000001",
+            "Content-Type": "application/json"
         };
         return headers;
 
@@ -272,6 +285,4 @@ class Tinder:
 
 if __name__ == "__main__":
     tinder = Tinder(fileName="credentials.json")
-    tinder.getMatches()
-        
-
+    recs = tinder.getRecommendations()
