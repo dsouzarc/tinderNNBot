@@ -2,30 +2,34 @@ import requests
 import json
 import sys
 
+from PIL import Image, ImageDraw
+
+class FacialEmotion:
+
+    jsonResponse = None
+
+    def __init__(self, jsonResponse):
+        self.jsonResponse = jsonResponse
+
+    def getDimensions(self):
+        dim = self.jsonResponse["faceRectangle"]
+        "Properties: height, left, top, width"
+        return dim
+
+    def getMainEmotion(self):
+        emotions = self.jsonResponse["scores"]
+
+        highestEmotion = emotions.keys()[0]
+        highestScore = emotions[highestEmotion]
+
+        for emotion in emotions.keys():
+            if emotions[emotion] > highestScore:
+                highestEmotion = emotion
+                highestScore = emotions[emotion]
+
+        return (highestEmotion, highestScore)
+
 class Microsoft:
-    class FacialEmotion:
-
-        jsonResponse = None
-
-        def __init__(self, jsonResponse):
-            self.jsonResponse = jsonResponse
-
-        def getDimensions(self):
-            dim = self.jsonResponse["faceRectangle"]
-            return (dim["height"], dim["left"], dim["top"], dim["width"])
-
-        def getMainEmotion(self):
-            emotions = self.jsonResponse["scores"]
-
-            highestEmotion = emotions.keys()[0]
-            highestScore = emotions[highestEmotion]
-
-            for emotion in emotions.keys():
-                if emotions[emotion] > highestScore:
-                    highestEmotion = emotion
-                    highestScore = emotions[emotion]
-
-            return (highestEmotion, highestScore)
 
 
     '''
@@ -61,15 +65,17 @@ class Microsoft:
         url = "https://api.projectoxford.ai/emotion/v1.0/recognize"
         response = self.session.post(url, headers=headers, json=body).json()
 
+        facialEmotions = []
 
         if len(response) != 0:
             for face in response:
-                f = Microsoft.FacialEmotion(face)
+                f = FacialEmotion(face)
+                facialEmotions.append(f)
                 print(f.getDimensions())
                 print(f.getMainEmotion())
             print("NOT 0")
 
-        return response
+        return facialEmotions
 
 
 
@@ -79,5 +85,34 @@ microsoft = Microsoft(fileName="credentials.json")
 faces = microsoft.getEmotions("https://scontent-lga3-1.xx.fbcdn.net/t31.0-8/14876465_10210383671844847_1308604206555951240_o.jpg")
 
 
+im = Image.open("/Users/Ryan/Downloads/14876465_10210383671844847_1308604206555951240_o.jpg")
+
+draw = ImageDraw.Draw(im)
+
+for f in faces:
+    face = f.getDimensions()
+    print(face)
+
+    lineFill = 500
+    lineWidth = 20
+
+    faceX0 = face["left"]
+    faceX1 = face["left"] + face["width"]
+    faceY0 = face["top"]
+    faceY1 = face["top"] + face["height"]
+
+    #Left to right side of face, top 
+    draw.line((faceX0, faceY0, faceX1, faceY0), width=lineWidth, fill=lineFill)
+
+    #Left to right side of face, bottom 
+    draw.line((faceX0, faceY1, faceX1, faceY1), width=lineWidth, fill=lineFill)
+
+    #Left side of face, top to bottom
+    draw.line((faceX0, faceY0, faceX0, faceY1), width=lineWidth, fill=lineFill)
+
+    #Right side of face, top to bottom
+    draw.line((faceX1, faceY0, faceX1, faceY1), width=lineWidth, fill=lineFill)
 
 
+
+im.show()
