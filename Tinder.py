@@ -69,14 +69,15 @@ class Tinder:
     Saves the tokens to file
     '''
     def saveTokensToFile(self):
-        data = {
-            "facebook_id": self.facebookID,
-            "facebook_token": self.facebookToken,
-            "my_name": self.myName,
-            "tinder_token": self.tinderToken,
-            "tinder_api_token": self.tinderAPIToken,
-            "last_updated": int(time.time())
-        };
+
+        data = json.load(open(self.credentialFileName))
+
+        data["facebook_id"] = self.facebookID
+        data["facebook_token"] = self.facebookToken
+        data["my_name"] = self.myName
+        data["tinder_token"] = self.tinderToken
+        data["tinder_api_token"] = self.tinderAPIToken
+        data["last_updated"] = int(time.time())
 
         with open(self.credentialFileName, 'w') as credentials:
             json.dump(data, credentials, indent=4, sort_keys=True);
