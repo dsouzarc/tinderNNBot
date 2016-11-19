@@ -161,5 +161,10 @@ if __name__ == "__main__":
 
     microsoft = Microsoft(fileName="credentials.json")
 
-    image = microsoft.drawFacesAndEmotions("https://scontent-lga3-1.xx.fbcdn.net/t31.0-8/14876465_10210383671844847_1308604206555951240_o.jpg")
+    if len(sys.argv) > 1:
+        url = sys.argv[1] #raw_input("Link to photo to analyze: ")
+    else:
+        url = "https://scontent-lga3-1.xx.fbcdn.net/t31.0-8/14876465_10210383671844847_1308604206555951240_o.jpg"
+
+    image = microsoft.drawFacesAndEmotions(url)
     image.show()
