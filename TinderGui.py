@@ -1,20 +1,28 @@
-import os;
-import sys;
-import urllib;
-import json;
+import os
+import sys
+import urllib
+import json
+import requests
 
 import cv2;
 import numpy
 
+from StringIO import StringIO
 from PIL import Image
+from PIL.ImageQt import ImageQt
 from PyQt4 import QtGui, QtCore
 
-from Tinder import Tinder;
-from Person import Person;
+from PyQt4.QtGui import QImage, QPixmap
+
+from Tinder import Tinder
+from Person import Person
+
+from Microsoft import Microsoft, FacialEmotion
 
 class TinderGui(QtGui.QWidget):
 
     tinder = None;
+    microsoft = None;
     recommendations = None;
 
     middleSection = None;
@@ -64,6 +72,7 @@ class TinderGui(QtGui.QWidget):
         self.superLikesRemainingCounter = 3;
 
         self.tinder = Tinder(fileName="credentials.json");
+        self.microsoft = Microsoft(fileName="credentials.json");
         self.recommendations = self.tinder.getRecommendations();
 
         if self.recommendations is None or len(self.recommendations) == 0:
@@ -222,35 +231,27 @@ class TinderGui(QtGui.QWidget):
     def displayPhoto(self):
 
         url = self.recommendations[0].photos[self.photoIndex];
+
+        #Get the image from the URL. We can now display it raw or analyze it then display it
+        image = Image.open(StringIO(requests.get(url).content))
+
+        #Let's analyze it and then display it
+        image = self.microsoft.drawFacesAndEmotions(pathToImage=url, image=image)
+
+        #Conversion magic to make it into PyQt.Gui form, and then display it
+        imageQt = ImageQt(image)
+        qiImage = QImage(imageQt)
+        pixMap = QPixmap(qiImage)
+
+        self.currentImageLabel.setPixmap(pixMap)
+
+        ''' - Old OpenCV code; we now use Microsoft Cognitive Services API
         data = urllib.urlopen(url).read();
-
         openCVImage  = self.handleFacialRecognition(data);
-
         #image = QtGui.QImage()
         #image.loadFromData(data)
-
-        self.currentImageLabel.setPixmap(openCVImage);
-
-
-        '''
-        if len(self.recommendations) == 0:
-            self.recommendations = self.tinder.getRecommendations();
-
-        if len(self.recommendations[0].photos) > 0:
-            self.recommendations = self.recommendations[1:]
-            #self.displayPhoto();
-
-        url = self.recommendations[0].photos[self.photoIndex];
-        data = urllib.urlopen(url).read();
-
-        openCVImage  = self.handleFacialRecognition(data);
-
-        #image = QtGui.QImage()
-        #image.loadFromData(data)
-
         self.currentImageLabel.setPixmap(openCVImage);
         '''
-
 
 
     ###########################################################
