@@ -2,6 +2,7 @@ import requests
 import json
 import sys
 
+from StringIO import StringIO
 from PIL import Image, ImageDraw, ImageFont
 
 class FacialEmotion:
@@ -77,15 +78,28 @@ class Microsoft:
 
         return facialEmotions
 
+    
+    def drawFacesAndEmotions(self, pathToImage, image=None):
+
+        #If we aren't supplied an image, download it
+        if image is None:
+            image = Image.open(StringIO(requests.get(pathToImage).content))
+
+
+        
+
 
 
 
 microsoft = Microsoft(fileName="credentials.json")
 
 facialEmotions = microsoft.getEmotions("https://scontent-lga3-1.xx.fbcdn.net/t31.0-8/14876465_10210383671844847_1308604206555951240_o.jpg")
+microsoft.drawFacesAndEmotions("https://scontent-lga3-1.xx.fbcdn.net/t31.0-8/14876465_10210383671844847_1308604206555951240_o.jpg")
 
 
 im = Image.open("/Users/Ryan/Downloads/14876465_10210383671844847_1308604206555951240_o.jpg")
+
+
 
 draw = ImageDraw.Draw(im)
 
