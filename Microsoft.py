@@ -2,7 +2,7 @@ import requests
 import json
 import sys
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 class FacialEmotion:
 
@@ -82,19 +82,18 @@ class Microsoft:
 
 microsoft = Microsoft(fileName="credentials.json")
 
-faces = microsoft.getEmotions("https://scontent-lga3-1.xx.fbcdn.net/t31.0-8/14876465_10210383671844847_1308604206555951240_o.jpg")
+facialEmotions = microsoft.getEmotions("https://scontent-lga3-1.xx.fbcdn.net/t31.0-8/14876465_10210383671844847_1308604206555951240_o.jpg")
 
 
 im = Image.open("/Users/Ryan/Downloads/14876465_10210383671844847_1308604206555951240_o.jpg")
 
 draw = ImageDraw.Draw(im)
 
-for f in faces:
-    face = f.getDimensions()
-    print(face)
+for facialEmotion in facialEmotions:
+    face = facialEmotion.getDimensions()
 
     lineFill = 500
-    lineWidth = 20
+    lineWidth = 5
 
     faceX0 = face["left"]
     faceX1 = face["left"] + face["width"]
@@ -113,6 +112,8 @@ for f in faces:
     #Right side of face, top to bottom
     draw.line((faceX1, faceY0, faceX1, faceY1), width=lineWidth, fill=lineFill)
 
+    mainEmotion = facialEmotion.getMainEmotion()
+    draw.text((max(0, faceX0 - 60), max(0, faceY0 - 40)), mainEmotion[0], font=ImageFont.truetype("Verdana.ttf",34), fill=lineFill)
 
 
 im.show()
