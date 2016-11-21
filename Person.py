@@ -1,4 +1,6 @@
-import json;
+import json
+import copy
+
 from dateutil.parser import parse
 from datetime import datetime
 
@@ -34,6 +36,13 @@ class Person:
             self.personID = personJSON["personID"];
             self.swiped = personJSON["swiped"];
 
+    def getMongoDataToSave(self):
+        mongoObject = copy.deepcopy(self.jsonData)
+        mongoObject["photos"] = self.photos
+        mongoObject["instagram"] = self.getInstagramPictures()
+        return mongoObject
+
+
     def getDataToSave(self):
         data = {
             "id": self.personID,
@@ -63,10 +72,12 @@ class Person:
         if "instagram" in self.jsonData:
             instagram = self.jsonData["instagram"];
 
-            if "completed_initial_fetch" in instagram and instagram["completed_initial_fetch"]:
-                photos = instagram["photos"];
-                for photo in photos:
-                    pictures.append(photo["image"]);
+            if instagram is not None:
+
+                if "completed_initial_fetch" in instagram and instagram["completed_initial_fetch"]:
+                    photos = instagram["photos"];
+                    for photo in photos:
+                        pictures.append(photo["image"]);
         return pictures;
 
     def getName(self):
