@@ -19,10 +19,13 @@ from Person import Person
 
 from Microsoft import Microsoft, FacialEmotion
 
+from MongoHandler import MongoHandler
+
 class TinderGui(QtGui.QWidget):
 
     tinder = None;
     microsoft = None;
+    mongoHandler = None;
     recommendations = None;
 
     middleSection = None;
@@ -73,6 +76,7 @@ class TinderGui(QtGui.QWidget):
 
         self.tinder = Tinder(fileName="credentials.json");
         self.microsoft = Microsoft(fileName="credentials.json");
+        self.mongoHandler = MongoHandler()
         self.recommendations = self.tinder.getRecommendations();
 
         if self.recommendations is None or len(self.recommendations) == 0:
@@ -236,7 +240,10 @@ class TinderGui(QtGui.QWidget):
         image = Image.open(StringIO(requests.get(url).content))
 
         #Let's analyze it and then display it
-        image = self.microsoft.drawFacesAndEmotions(pathToImage=url, image=image)
+        try:
+            image = self.microsoft.drawFacesAndEmotions(pathToImage=url, image=image)
+        except TypeError, e:
+            print("Could not find any faces in image")
 
         #Conversion magic to make it into PyQt.Gui form, and then display it
         imageQt = ImageQt(image)
@@ -278,11 +285,8 @@ class TinderGui(QtGui.QWidget):
 
         elif key == QtCore.Qt.Key_Up:
             self.photoIndex -= 1;
-            print("next photo: " + str(self.recommendations[0].photos))
             if self.photoIndex < 0:
-                print("Less than 1")
                 self.photoIndex = len(self.recommendations[0].photos) - 1;
-                print("NEW INDEX: " + str(self.photoIndex))
             self.displayPhoto();
 
         elif key == QtCore.Qt.Key_Down:
@@ -317,11 +321,14 @@ class TinderGui(QtGui.QWidget):
         success, result = self.tinder.superLike(self.recommendations[0].personID)
 
         if success:
-            self.superLikedIDs.append(self.recommendations[0].getDataToSave())
+            self.mongoHandler.superLike(self.recommendations[0])
+            #self.superLikedIDs.append(self.recommendations[0].getDataToSave())
+
             result = result["super_likes"];
             self.superLikesRemainingCounter = result["remaining"];
             self.superLikeCounter += 1;
             self.handleSwipe();
+
         else:
             QtGui.QMessageBox.about(self, "Error super liking person", json.dumps(result,indent=4));
 
@@ -333,10 +340,13 @@ class TinderGui(QtGui.QWidget):
         success, result = self.tinder.swipeRight(self.recommendations[0].personID)
 
         if success:
-            self.likedIDs.append(self.recommendations[0].getDataToSave())
+            self.mongoHandler.swipeRight(self.recommendations[0])
+            #self.likedIDs.append(self.recommendations[0].getDataToSave())
+
             self.likesRemainingCounter = result["likes_remaining"];
             self.likeCounter += 1;
             self.handleSwipe();
+
         else:
             QtGui.QMessageBox.about(self, "Error liking person", json.dumps(result,indent=4));
 
@@ -348,9 +358,12 @@ class TinderGui(QtGui.QWidget):
         success, result = self.tinder.swipeLeft(self.recommendations[0].personID);
 
         if success:
-            self.passedIDs.append(self.recommendations[0].getDataToSave())
+            self.mongoHandler.swipeLeft(self.recommendations[0])
+            #self.passedIDs.append(self.recommendations[0].getDataToSave())
+
             self.rejectCounter += 1;
             self.handleSwipe();
+
         else:
             QtGui.QMessageBox.about(self, "Error swiping left", json.dumps(result,indent=4));
 
