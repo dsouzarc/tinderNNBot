@@ -52,7 +52,6 @@ class MongoHandler:
         except Exception, e:
             print("Error saving left swipe: " + str(e))
 
-
 if __name__ == "__main__":
     mongo = MongoHandler()
 
