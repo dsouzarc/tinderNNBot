@@ -241,7 +241,8 @@ class TinderGui(QtGui.QWidget):
 
         #Let's analyze it and then display it
         try:
-            image = self.microsoft.drawFacesAndEmotions(pathToImage=url, image=image)
+            facialEmotions = self.microsoft.getEmotions(pathToImage)
+            image = self.microsoft.drawFacesAndEmotions(pathToImage=url, image=image, facialEmotions=facialEmotions)
         except TypeError, e:
             print("Could not find any faces in image")
 
