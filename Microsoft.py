@@ -98,6 +98,8 @@ class Microsoft:
             for face in response:
                 f = FacialEmotion(face)
                 facialEmotions.append(f)
+        else:
+            print("No faces in this image: " + linkToImage)
 
         return facialEmotions
 
