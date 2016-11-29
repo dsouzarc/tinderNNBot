@@ -37,6 +37,7 @@ class TinderGui(QtGui.QWidget):
     personDescriptionTextEdit = None;
 
     photoIndex = None;
+    analyzedPhotos = None;
 
     rejectCounter = None;
     likeCounter = None;
@@ -68,6 +69,8 @@ class TinderGui(QtGui.QWidget):
         super(TinderGui, self).__init__();
 
         self.photoIndex = 0;
+        self.analyzedPhotos = [];
+
         self.rejectCounter = 0;
         self.likeCounter = 0;
         self.superLikeCounter = 0;
@@ -234,17 +237,11 @@ class TinderGui(QtGui.QWidget):
     '''
     def displayPhoto(self):
 
-        url = self.recommendations[0].photos[self.photoIndex];
+        if len(self.analyzedPhotos) == 0:
+            self.analyzePhotos()
 
-        #Get the image from the URL. We can now display it raw or analyze it then display it
-        image = Image.open(StringIO(requests.get(url).content))
-
-        #Let's analyze it and then display it
-        try:
-            facialEmotions = self.microsoft.getEmotions(url)
-            image = self.microsoft.drawFacesAndEmotions(pathToImage=url, image=image, facialEmotions=facialEmotions)
-        except TypeError, e:
-            print("Could not find any faces in image")
+        analyzedPhoto = self.analyzedPhotos[self.photoIndex]
+        image = analyzedPhoto["image"]
 
         #Conversion magic to make it into PyQt.Gui form, and then display it
         imageQt = ImageQt(image)
@@ -303,6 +300,7 @@ class TinderGui(QtGui.QWidget):
     def handleSwipe(self):
 
         self.photoIndex = 0
+        self.analyzePhotos()
 
         if len(self.recommendations) == 1:
             self.recommendations = self.tinder.getRecommendations();
@@ -313,6 +311,40 @@ class TinderGui(QtGui.QWidget):
         self.displayInformation();
         self.displaySwipeInformation();
         self.middleSection.setFocus()
+
+
+    def analyzePhotos(self):
+
+        #Clear out our previously saved photos
+        self.analyzedPhotos = [];
+
+        #Go through all the photos for the first recommendation
+        for photoUrl in self.recommendations[0].photos:
+
+            #Get the image from the URL. We can now store/display it raw or analyze it then display it
+            image = Image.open(StringIO(requests.get(photoUrl).content))
+            facialEmotions = {}
+
+            #Let's analyze it, store it, and then display it
+            try:
+                facialEmotions = self.microsoft.getEmotions(photoUrl)
+                image = self.microsoft.drawFacesAndEmotions(pathToImage=photoUrl, image=image, facialEmotions=facialEmotions)
+
+            except TypeError, e:
+                print("Could not find any faces in image")
+
+            #Add it to our array
+            analyzedPhoto = {
+                "facialEmotions": facialEmotions,
+                "image": image
+            }
+            self.analyzedPhotos.append(analyzedPhoto)
+
+        if len(self.analyzedPhotos) != len(self.recommendations[0].photos):
+            print("ANALYZED != TO RECOMMENDED")
+
+
+
 
 
     '''
