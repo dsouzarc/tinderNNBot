@@ -16,11 +16,14 @@ Uses PyQt for the GUI and Tinder's (unofficial) REST API.
 
 
 ---
-Though it is a boring/plain GUI, its main task is to train the neural net to on what the user likes and provide an interface for correcting the facial characteristics identified by OpenCV.
+Though it is a boring/plain GUI, its main task is to train the neural net to on what the user likes and provide an interface for correcting the facial characteristics identified by Microsoft Cognitive Services API
 
 ![Screenshot 2](https://github.com/dsouzarc/tinderAPI/blob/master/Screenshots/Screenshot_2.png)
 
 ![Screenshot 3](https://github.com/dsouzarc/tinderAPI/blob/master/Screenshots/Screenshot_3.png)
+
+---
+Facial recognition using OpenCV
 
 ![Screenshot 0](https://github.com/dsouzarc/tinderAPI/blob/master/Screenshots/Screenshot_0.png)
 
