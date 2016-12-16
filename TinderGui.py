@@ -23,6 +23,8 @@ from MongoHandler import MongoHandler
 
 class TinderGui(QtGui.QWidget):
 
+    appGui = None;
+
     tinder = None;
     microsoft = None;
     mongoHandler = None;
@@ -34,6 +36,7 @@ class TinderGui(QtGui.QWidget):
     superLikeButton = None;
 
     currentImageLabel = None;
+    currentStatusLabel = None;
     personDescriptionTextEdit = None;
 
     photoIndex = None;
@@ -65,8 +68,10 @@ class TinderGui(QtGui.QWidget):
     #                                                         #  
     ###########################################################
 
-    def __init__(self):
+    def __init__(self, appGui):
         super(TinderGui, self).__init__();
+
+        self.appGui = appGui
 
         self.photoIndex = 0;
         self.analyzedPhotos = [];
@@ -104,6 +109,7 @@ class TinderGui(QtGui.QWidget):
         buttonSection.addWidget(self.superLikeButton);
 
         self.middleSection = QtGui.QSplitter(QtCore.Qt.Vertical)
+        self.middleSection.addWidget(self.currentStatusLabel)
         self.middleSection.addWidget(self.currentImageLabel);
         self.middleSection.addWidget(buttonSection);
 
@@ -155,6 +161,7 @@ class TinderGui(QtGui.QWidget):
     '''
     def createUIComponents(self):
         self.currentImageLabel = QtGui.QLabel(self)
+        self.currentStatusLabel = QtGui.QLabel(self)
 
         self.swipeRightButton = QtGui.QPushButton('Like', self);
         self.swipeLeftButton = QtGui.QPushButton('Pass', self);
@@ -300,13 +307,14 @@ class TinderGui(QtGui.QWidget):
     def handleSwipe(self):
 
         self.photoIndex = 0
-        self.analyzePhotos()
 
         if len(self.recommendations) == 1:
+            self.currentStatusLabel.setText("Getting more recommendations")
             self.recommendations = self.tinder.getRecommendations();
         else:
             self.recommendations = self.recommendations[1:];
 
+        self.analyzePhotos()
         self.displayPhoto();
         self.displayInformation();
         self.displaySwipeInformation();
@@ -315,11 +323,16 @@ class TinderGui(QtGui.QWidget):
 
     def analyzePhotos(self):
 
+        self.currentStatusLabel.setText("Analyzing photos")
+
         #Clear out our previously saved photos
         self.analyzedPhotos = [];
 
         #Go through all the photos for the first recommendation
         for photoUrl in self.recommendations[0].photos:
+
+            self.currentStatusLabel.setText("Analyzing photo: #" + str(len(self.analyzedPhotos)))
+            self.appGui.processEvents()
 
             #Get the image from the URL. We can now store/display it raw or analyze it then display it
             image = Image.open(StringIO(requests.get(photoUrl).content))
@@ -340,17 +353,17 @@ class TinderGui(QtGui.QWidget):
             }
             self.analyzedPhotos.append(analyzedPhoto)
 
+        self.currentStatusLabel.setText("Finished analying this user's photos")
+
         if len(self.analyzedPhotos) != len(self.recommendations[0].photos):
             print("ANALYZED != TO RECOMMENDED")
-
-
-
 
 
     '''
     Handles super-liking 
     '''
     def superLike(self):
+        self.currentStatusLabel.setText("Handling super like")
         success, result = self.tinder.superLike(self.recommendations[0].personID)
 
         if success:
@@ -370,6 +383,8 @@ class TinderGui(QtGui.QWidget):
     Handles liking - regular swipe 
     '''
     def swipeRight(self):
+
+        self.currentStatusLabel.setText("Handling right swipe")
         success, result = self.tinder.swipeRight(self.recommendations[0].personID)
 
         if success:
@@ -388,6 +403,7 @@ class TinderGui(QtGui.QWidget):
     Handles passing - left swipe
     '''
     def swipeLeft(self):
+        self.currentStatusLabel.setText("Handling left swipe")
         success, result = self.tinder.swipeLeft(self.recommendations[0].personID);
 
         if success:
@@ -496,7 +512,7 @@ class TinderGui(QtGui.QWidget):
 
 def main():
     app = QtGui.QApplication(sys.argv);
-    tinderGui = TinderGui();
+    tinderGui = TinderGui(app);
     sys.exit(app.exec_());
 
 
