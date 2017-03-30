@@ -1,6 +1,6 @@
-#Written by Ryan D'souza
+# Written by Ryan D'souza
 
-##A Tinder Bot - under construction
+## A Tinder Bot - under construction
 
 The bot analyzes the facial components of people you swipe for on Tinder so that it can automate the process and swipe for you.
 
